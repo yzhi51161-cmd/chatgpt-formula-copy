@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <title>ChatGPT LaTeX Copy Fixture</title>
+  </head>
+  <body>
+    <main>
+      <p>
+        行内公式：
+        <span id="inline" class="katex">
+          <span class="katex-mathml">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+              <semantics>
+                <mrow><mi>x</mi><mo>=</mo><mn>1</mn></mrow>
+                <annotation encoding="application/x-tex">x^2+y^2=1</annotation>
+              </semantics>
+            </math>
+          </span>
+          <span class="katex-html" aria-hidden="true"><span class="mord">x²+y²=1</span></span>
+        </span>
+      </p>
+
+      <div id="data-math" data-math="\[\int_0^1 x^2\,dx\]">
+        <span class="visual-formula">∫₀¹x²dx</span>
+      </div>
+
+      <math id="alttext" alttext="\frac{a}{b}">
+        <mfrac><mi>a</mi><mi>b</mi></mfrac>
+      </math>
+
+      <span id="current-chatgpt" role="math"
+            aria-label="a_{5,2}\neq a_{2,5},"
+            data-math-source="a_{5,2}\neq a_{2,5},"
+            data-client-katex-layout style="display: block;">
+        <span class="katex">
+          <span class="katex-html" aria-hidden="true">
+            <span class="base"><span class="mord">a₅,₂ ≠ a₂,₅</span></span>
+          </span>
+        </span>
+      </span>
+
+      <div id="dynamic-root"></div>
+    </main>
+  </body>
+</html>
