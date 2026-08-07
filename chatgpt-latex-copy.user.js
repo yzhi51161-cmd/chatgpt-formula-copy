@@ -4,6 +4,10 @@
 // @version      4.0.0
 // @license      MIT
 // @description  单击 ChatGPT 公式即可复制规整的 LaTeX，支持智能 Markdown 分隔符和原始源码模式。
+// @homepageURL  https://github.com/yzhi51161-cmd/chatgpt-formula-copy
+// @supportURL   https://github.com/yzhi51161-cmd/chatgpt-formula-copy/issues
+// @downloadURL  https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js
+// @updateURL    https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js
 // @match        https://chatgpt.com/*
 // @match        https://*.chatgpt.com/*
 // @match        https://chat.openai.com/*

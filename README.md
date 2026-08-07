@@ -19,10 +19,9 @@
 ## 安装
 
 1. 安装 [Tampermonkey](https://www.tampermonkey.net/) 或 Violentmonkey。
-2. 在本仓库打开 [`chatgpt-latex-copy.user.js`](./chatgpt-latex-copy.user.js)。
-3. 点击 GitHub 页面右上方的 **Raw**。
-4. 在脚本管理器的安装页面确认安装。
-5. 打开或刷新 `https://chatgpt.com/`，页面右下角应出现绿色的 **公式复制** 按钮。
+2. 点击 [直接安装脚本](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js)。
+3. 在脚本管理器的安装页面确认安装。
+4. 打开或刷新 `https://chatgpt.com/`，页面右下角应出现绿色的 **公式复制** 按钮。
 
 也可以在脚本管理器中新建脚本，粘贴 `chatgpt-latex-copy.user.js` 的完整内容后保存。
 
