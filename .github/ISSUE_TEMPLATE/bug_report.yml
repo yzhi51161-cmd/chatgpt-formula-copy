@@ -1,0 +1,43 @@
+name: Formula copy problem
+description: Report a formula that cannot be copied or is copied incorrectly
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting a reproducible formula-copy problem. Please avoid posting private conversation content.
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and Userscript manager
+      placeholder: Chrome 128, Tampermonkey 5.x
+    validations:
+      required: true
+  - type: input
+    id: script_version
+    attributes:
+      label: Script version
+      placeholder: 4.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: formula
+    attributes:
+      label: Formula or minimal example
+      description: Provide only the affected formula or a non-sensitive minimal example.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected clipboard text
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result and diagnostic
+      description: Paste the script's narrow formula diagnostic if available.
+    validations:
+      required: true
