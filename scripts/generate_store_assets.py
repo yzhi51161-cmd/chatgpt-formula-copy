@@ -92,13 +92,27 @@ def rounded_paste(canvas: Image.Image, source: Image.Image, box: tuple[int, int,
     canvas.paste(fitted, (box[0], box[1]), mask)
 
 
+def rounded_contain_paste(
+    canvas: Image.Image,
+    source: Image.Image,
+    box: tuple[int, int, int, int],
+    radius: int,
+) -> None:
+    width, height = box[2] - box[0], box[3] - box[1]
+    panel = Image.new("RGB", (width, height), "#000000")
+    fitted = ImageOps.contain(source.convert("RGB"), (width, height), Image.Resampling.LANCZOS)
+    panel.paste(fitted, ((width - fitted.width) // 2, (height - fitted.height) // 2))
+    mask = Image.new("L", (width, height), 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, width - 1, height - 1), radius=radius, fill=255)
+    canvas.paste(panel, (box[0], box[1]), mask)
+
+
 def make_store_screenshot(source: Image.Image) -> Image.Image:
     canvas = Image.new("RGB", (1280, 800), "#08110f")
     draw = ImageDraw.Draw(canvas)
     draw.text((54, 30), "框选整段，公式自动复制为 LaTeX", font=font(30, bold=True), fill="#f8fafc")
     draw.text((54, 72), "普通文字保持原顺序 · 支持 Ctrl+C 与右键复制", font=font(18), fill="#86efac")
-    clean_source = source.crop((0, 0, source.width, int(source.height * 0.78)))
-    rounded_paste(canvas, clean_source, (42, 112, 1238, 775), 18)
+    rounded_contain_paste(canvas, source, (42, 112, 1238, 775), 18)
     draw.rounded_rectangle((42, 112, 1238, 775), radius=18, outline="#34d399", width=2)
     return canvas
 
@@ -129,8 +143,7 @@ def make_share(source: Image.Image) -> Image.Image:
     draw = ImageDraw.Draw(canvas)
     draw.text((54, 42), "ChatGPT 公式复制", font=font(42, bold=True), fill="#ffffff")
     draw.text((54, 100), "像复制普通文字一样，自动得到 LaTeX", font=font(25), fill="#86efac")
-    clean_source = source.crop((0, 0, source.width, int(source.height * 0.78)))
-    rounded_paste(canvas, clean_source, (54, 160, 1146, 635), 20)
+    rounded_contain_paste(canvas, source, (54, 160, 1146, 635), 20)
     draw.rounded_rectangle((54, 160, 1146, 635), radius=20, outline="#34d399", width=2)
     return canvas
 
