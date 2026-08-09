@@ -1,11 +1,11 @@
 {
   "extensionName": {
-    "message": "ChatGPT Formula Nook"
+    "message": "ChatGPT Formula Copy"
   },
   "extensionDescription": {
-    "message": "Collect ChatGPT formulas, selections, answers, code, and conversations as reusable text."
+    "message": "Copy ChatGPT formulas as clean LaTeX, or extract answers and conversations as Markdown."
   },
   "actionTitle": {
-    "message": "ChatGPT Formula Nook"
+    "message": "ChatGPT Formula Copy"
   }
 }

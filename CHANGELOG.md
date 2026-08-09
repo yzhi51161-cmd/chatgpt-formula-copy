@@ -1,16 +1,17 @@
 # Changelog
 
-## 5.0.0 - Unreleased
+## 5.0.0 - 2026-08-09
 
 - Redesigned the in-page control as an animated Copy / Export / Settings toolkit.
 - Added live Chrome popup status and a no-new-permission bridge to open the page tools.
 - Added Markdown copy for the latest assistant response and the full current conversation.
-- Added Markdown copy for the current selection plus shortcuts for the latest and all assistant code blocks.
-- Reworked the page panel and popup into a light, stationery-inspired visual style with shorter UI copy.
+- Added Markdown copy for the current selection and a focused conversation-extraction pane.
+- Reworked the draggable page panel and popup into a fresh blue, dreamlike visual style with a new local icon and shorter UI copy.
 - Added local `.md` downloads preserving headings, emphasis, lists, quotes, code blocks, tables, links, image references, and LaTeX.
 - Replaced the 1.2-second UI recovery poll with targeted `MutationObserver` recovery.
 - Added a reusable clipboard textarea and linear top-level formula deduplication; formula source and display mode stay live for streaming answers.
-- Added first-run confirmation and documented Chrome 138+ Tampermonkey “Allow User Scripts” requirements.
+- Documented Chrome 138+ Tampermonkey “Allow User Scripts” requirements, clarified standalone-extension permissions, and added a compact in-UI address helper.
+- Added reproducible icon and UI-preview generation scripts.
 - Added rich-export, 250-formula performance, immediate control recovery, MV3 messaging, popup, and download tests.
 
 ## 4.1.0 - 2026-08-09

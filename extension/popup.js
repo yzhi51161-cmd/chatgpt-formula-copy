@@ -5,6 +5,7 @@ const formulaCount = document.getElementById("formula-count");
 const messageCount = document.getElementById("message-count");
 const openCopy = document.getElementById("open-copy");
 const openExport = document.getElementById("open-export");
+const userscriptHelp = document.getElementById("userscript-help");
 
 function setToolButtonsEnabled(enabled) {
   openCopy.disabled = !enabled;
@@ -70,6 +71,22 @@ openCopy.addEventListener("click", () => openPanel("copy"));
 openExport.addEventListener("click", () => openPanel("export"));
 document.getElementById("open-chatgpt").addEventListener("click", () => {
   chrome.tabs.create({ url: "https://chatgpt.com/" });
+});
+userscriptHelp.addEventListener("click", async () => {
+  const address = "chrome://extensions";
+  try {
+    await navigator.clipboard.writeText(address);
+  } catch (error) {
+    const textarea = document.createElement("textarea");
+    textarea.value = address;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.append(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  }
+  userscriptHelp.textContent = "已复制，请打开 Tampermonkey 详情";
 });
 
 refreshStatus();

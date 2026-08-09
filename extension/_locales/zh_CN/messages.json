@@ -1,11 +1,11 @@
 {
   "extensionName": {
-    "message": "ChatGPT 公式小站"
+    "message": "ChatGPT 公式复制"
   },
   "extensionDescription": {
-    "message": "轻松带走 ChatGPT 的公式、选区、回答、代码和 Markdown 对话。"
+    "message": "单击或框选 ChatGPT 公式，复制为规整的 LaTeX；也可提取对话为 Markdown。"
   },
   "actionTitle": {
-    "message": "ChatGPT 公式小站"
+    "message": "ChatGPT 公式复制"
   }
 }

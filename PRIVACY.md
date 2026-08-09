@@ -4,7 +4,7 @@ Last updated: 2026-08-09
 
 ## 中文
 
-ChatGPT 公式小站用于把公式、选区、回答、代码或当前对话转换为便于继续使用的 LaTeX、纯文本或 Markdown。
+ChatGPT 公式复制用于把公式、选区、回答或当前对话转换为便于继续使用的 LaTeX、纯文本或 Markdown。
 
 - 扩展会在 `chatgpt.com` 与 `chat.openai.com` 页面中本地识别公式和可见消息，以显示页面数量；这些计数不保存。
 - 用户执行复制或整理操作时，扩展会在本地读取对应公式、选区、代码、回答或对话 DOM。可选导出元数据包含页面标题、URL 和生成时间，并只写入用户复制或下载的 Markdown。
@@ -20,7 +20,7 @@ ChatGPT 公式小站用于把公式、选区、回答、代码或当前对话转
 
 ## English
 
-ChatGPT Formula Nook converts formulas, selections, answers, code, or the current conversation into reusable LaTeX, plain text, or Markdown.
+ChatGPT Formula Copy converts formulas, selections, answers, or the current conversation into reusable LaTeX, plain text, or Markdown.
 
 - The extension locally identifies formulas and visible messages on `chatgpt.com` and `chat.openai.com` to display page counts. These counts are not stored.
 - When the user runs a copy or collection action, the extension locally reads the corresponding formula, selection, code, answer, or conversation DOM. Optional export metadata contains the page title, URL, and generation time and is written only into the Markdown the user copies or downloads.

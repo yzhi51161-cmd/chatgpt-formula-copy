@@ -66,7 +66,7 @@ const chromePath = process.env.CHROME_PATH;
 
     const launcher = page.locator("#gpt-formula-copy-control #launcher");
     await launcher.waitFor({ state: "visible" });
-    assert.match(await launcher.innerText(), /公式小站/);
+    assert.match(await launcher.innerText(), /公式复制/);
 
     await launcher.click();
     await page.locator("#gpt-formula-copy-control #panel").waitFor({ state: "visible" });

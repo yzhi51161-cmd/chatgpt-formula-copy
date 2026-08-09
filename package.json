@@ -2,11 +2,13 @@
   "name": "chatgpt-formula-copy",
   "version": "5.0.0",
   "private": true,
-  "description": "Collect ChatGPT formulas, selections, answers, code, and conversations as reusable text.",
+  "description": "Copy ChatGPT formulas as clean LaTeX and extract math-rich conversations as Markdown.",
   "license": "MIT",
   "scripts": {
     "build:chrome": "python scripts/build_chrome_extension.py",
-    "check": "node --check chatgpt-latex-copy.user.js && node --check extension/popup.js && node --check test/smoke.cjs && node --check test/chrome-extension-smoke.cjs && node --check test/popup-smoke.cjs",
+    "icons": "python scripts/generate_extension_icons.py",
+    "preview": "node scripts/generate_ui_previews.cjs",
+    "check": "node --check chatgpt-latex-copy.user.js && node --check extension/popup.js && node --check scripts/generate_ui_previews.cjs && node --check test/smoke.cjs && node --check test/chrome-extension-smoke.cjs && node --check test/popup-smoke.cjs",
     "test": "npm run check && npm run build:chrome && node --check dist/chatgpt-formula-copy-chrome/content.js && node test/smoke.cjs && node test/chrome-extension-smoke.cjs && node test/popup-smoke.cjs"
   },
   "devDependencies": {

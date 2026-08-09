@@ -3,16 +3,16 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>公式小站</title>
+    <title>公式复制</title>
     <link rel="stylesheet" href="popup.css">
   </head>
   <body>
     <main>
       <header>
-        <img src="icons/icon-48.png" width="44" height="44" alt="">
+        <img src="icons/icon-128.png" width="72" height="72" alt="">
         <div class="brand-copy">
-          <p class="eyebrow">FORMULA NOTE</p>
-          <h1>公式小站</h1>
+          <p class="eyebrow">FORMULA COPY</p>
+          <h1>公式复制</h1>
         </div>
         <span class="version">v5.0</span>
       </header>
@@ -31,20 +31,22 @@
         <div><strong>Local</strong><span>本地</span></div>
       </section>
 
-      <section class="feature-card">
-        <div class="feature"><span class="feature-icon">Σ</span><strong>公式</strong></div>
-        <div class="feature"><span class="feature-icon">M↓</span><strong>Markdown</strong></div>
-      </section>
-
       <div class="actions">
-        <button id="open-copy" class="primary" type="button" disabled><span>复制公式</span><span>→</span></button>
-        <button id="open-export" type="button" disabled><span>整理对话</span><span>.md</span></button>
+        <button id="open-copy" class="primary" type="button" disabled><span class="action-main"><span class="action-symbol">Σ</span><span>公式复制</span></span><span>→</span></button>
+        <button id="open-export" type="button" disabled><span class="action-main"><span class="action-symbol">M↓</span><span>对话提取</span></span><span>.md</span></button>
         <button id="open-chatgpt" type="button"><span>去 ChatGPT</span><span>↗</span></button>
       </div>
 
+      <a class="star-project" href="https://github.com/yzhi51161-cmd/chatgpt-formula-copy" target="_blank" rel="noreferrer">
+        <span class="star-icon" aria-hidden="true">★</span>
+        <span>为项目点亮一颗星</span>
+        <span aria-hidden="true">↗</span>
+      </a>
+
       <p class="privacy">内容只在本机整理，不会上传。</p>
+      <button id="userscript-help" class="userscript-help" type="button">油猴版没显示？复制权限页地址</button>
       <nav>
-        <a href="https://github.com/yzhi51161-cmd/chatgpt-formula-copy" target="_blank" rel="noreferrer">GitHub</a>
+        <span>v5.0</span>
         <span>·</span>
         <a href="https://github.com/yzhi51161-cmd/chatgpt-formula-copy/issues" target="_blank" rel="noreferrer">反馈</a>
       </nav>

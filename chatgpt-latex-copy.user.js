@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         ChatGPT 公式小站
+// @name         ChatGPT 公式复制
 // @namespace    chatgpt-formula-copy.share
 // @version      5.0.0
 // @license      MIT
-// @description  轻松带走 ChatGPT 的公式、选区、回答、代码和 Markdown 对话。
+// @description  单击或框选 ChatGPT 公式，复制为规整 LaTeX；也可提取对话为 Markdown。
 // @homepageURL  https://github.com/yzhi51161-cmd/chatgpt-formula-copy
 // @supportURL   https://github.com/yzhi51161-cmd/chatgpt-formula-copy/issues
 // @downloadURL  https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js
@@ -24,6 +24,8 @@
   const INSTALL_KEY = "__chatgptFormulaCopyInstalled";
   if (globalThis[INSTALL_KEY]) return;
   globalThis[INSTALL_KEY] = true;
+
+  const CONTROL_ICON_DATA_URL = "data:image/png;base64,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";
 
   const FORMULA_SELECTOR = [
     "span.katex",
@@ -57,14 +59,14 @@
     html[data-gpt-formula-copy-enabled="true"] [data-math]:hover,
     html[data-gpt-formula-copy-enabled="true"] [data-latex]:hover,
     html[data-gpt-formula-copy-enabled="true"] [data-tex]:hover {
-      outline: 2px solid #79bfa4 !important;
+      outline: 2px solid #6f94e5 !important;
       outline-offset: 3px !important;
       border-radius: 7px !important;
-      background: rgba(219, 244, 234, 0.62) !important;
+      background: rgba(218, 231, 255, 0.66) !important;
     }
 
     .gpt-latex-copy-flash {
-      outline: 2px solid #62ad90 !important;
+      outline: 2px solid #527bd6 !important;
       outline-offset: 3px !important;
       border-radius: 7px !important;
     }
@@ -637,29 +639,6 @@
       .filter(({ role, markdown }) => (role === "user" || role === "assistant") && markdown);
   }
 
-  function collectAssistantCodeBlocks(root = document) {
-    const blocks = [];
-    for (const message of visibleConversationMessageElements(root)) {
-      if (message.getAttribute("data-message-author-role") !== "assistant") continue;
-      for (const pre of messageContentElement(message).querySelectorAll("pre")) {
-        const code = pre.querySelector("code") || pre;
-        const text = (code.textContent || "").replace(/\r\n?/g, "\n").replace(/^\n|\n$/g, "");
-        if (!text.trim()) continue;
-        const language = codeBlockLanguage(pre, code);
-        blocks.push({ text, language, markdown: fencedCodeMarkdown(text, language) });
-      }
-    }
-    return blocks;
-  }
-
-  function allAssistantCodeMarkdown(root = document) {
-    return collectAssistantCodeBlocks(root).map(({ markdown }) => markdown).join("\n\n");
-  }
-
-  function lastAssistantCode(root = document) {
-    return collectAssistantCodeBlocks(root).at(-1)?.text || "";
-  }
-
   function conversationTitle() {
     const raw = (document.title || "")
       .replace(/\s*[|–—-]\s*ChatGPT\s*$/i, "")
@@ -888,7 +867,7 @@
     const messages = visibleConversationMessageElements().length;
     document.documentElement.dataset.gptFormulaCopyEnabled = String(copyEnabled);
     launcher.dataset.enabled = String(copyEnabled || selectionCopyEnabled);
-    launcher.title = "打开公式小站";
+    launcher.title = "打开公式复制";
     status.textContent = message || "就绪";
     controlShadow.getElementById("formula-metric").textContent = String(formulas);
     controlShadow.getElementById("message-metric").textContent = String(messages);
@@ -944,203 +923,135 @@
     controlShadow.innerHTML = `
       <style>
         :host {
-          color-scheme: dark;
-          --accent: #10b981;
-          --accent-strong: #059669;
-          --accent-soft: rgba(16,185,129,.14);
-          --panel: rgba(14,18,24,.94);
-          --panel-2: rgba(31,41,55,.72);
-          --surface: rgba(255,255,255,.065);
-          --surface-hover: rgba(255,255,255,.105);
-          --border: rgba(255,255,255,.12);
-          --text: #f8fafc;
-          --muted: #9ca3af;
+          color-scheme: light;
+          --ink: #303a5a;
+          --muted: #66708b;
+          --paper: rgba(248,251,255,.86);
+          --paper-strong: rgba(255,255,255,.82);
+          --line: rgba(111,137,198,.4);
+          --blue: #527bd6;
+          --blue-deep: #344e96;
+          --blue-soft: rgba(214,229,255,.78);
+          --sakura: #d96f96;
+          --sakura-soft: rgba(247,220,232,.72);
+          --leaf: #5f9a80;
+          --leaf-soft: rgba(220,240,230,.78);
+          --lavender: #9180c3;
+          --lavender-soft: rgba(230,224,248,.72);
+          font: 13px/1.45 ui-rounded, "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
         }
         * { box-sizing: border-box; }
         button, select, textarea { font: inherit; }
         button { -webkit-tap-highlight-color: transparent; }
         #launcher {
-          display: flex; align-items: center; gap: 8px; min-height: 42px;
-          padding: 7px 9px 7px 8px; border: 1px solid rgba(255,255,255,.18);
-          border-radius: 999px; background: linear-gradient(135deg,#10b981,#087f5b);
-          box-shadow: 0 10px 32px rgba(0,0,0,.30), 0 0 0 1px rgba(16,185,129,.08);
-          color: #fff; cursor: pointer;
-          font: 650 13px/1 system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
-          transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+          display:flex; align-items:center; gap:9px; min-height:52px;
+          padding:7px 11px 7px 7px; border:1px solid rgba(92,128,211,.58); border-radius:999px;
+          background:linear-gradient(135deg,rgba(255,255,255,.97),rgba(224,236,255,.96) 52%,rgba(239,233,252,.94)); color:#35436c; cursor:pointer;
+          box-shadow:0 12px 34px rgba(58,83,157,.22),0 3px 15px rgba(91,142,190,.15),inset 0 1px rgba(255,255,255,.96);
+          font-weight:700;
+          transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
         }
-        #launcher:hover { transform: translateY(-2px); filter: brightness(1.07); box-shadow: 0 14px 38px rgba(0,0,0,.34); }
-        #launcher:active { transform: translateY(0) scale(.98); }
-        #launcher:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid #6ee7b7; outline-offset: 2px; }
-        #launcher[data-enabled="false"] { background: linear-gradient(135deg,#52525b,#3f3f46); }
-        #launcher-icon {
-          display:grid; place-items:center; width:28px; height:28px; border-radius:50%;
-          background:rgba(255,255,255,.18); font:700 17px/1 Georgia,serif;
-        }
+        #launcher:hover { transform:translateY(-3px) rotate(-.35deg); border-color:#527bd6; box-shadow:0 17px 40px rgba(58,83,157,.28),0 4px 18px rgba(107,143,219,.18); }
+        #launcher:active { transform:translateY(0) scale(.98); }
+        #launcher[data-enabled="false"] { background:#eee9e5; color:#8e8488; border-color:#d6ceca; }
+        #launcher:focus-visible, button:focus-visible, select:focus-visible { outline:2px solid #557fd8; outline-offset:2px; }
+        #launcher-icon { display:block; width:38px; height:38px; border:1px solid rgba(255,255,255,.9); border-radius:12px; object-fit:cover; box-shadow:0 5px 14px rgba(63,91,166,.28); }
         #launcher-count {
           display:grid; place-items:center; min-width:22px; height:22px; padding:0 6px;
-          border-radius:999px; background:rgba(0,0,0,.20); color:#d1fae5; font-size:11px;
+          border-radius:999px; background:linear-gradient(135deg,var(--blue-soft),var(--lavender-soft)); color:#3f5f9e; font-size:11px;
         }
         #panel {
-          position: absolute; right: 0; bottom: 54px; width: min(360px, calc(100vw - 28px));
-          padding: 15px; border: 1px solid var(--border); border-radius: 20px;
-          background: var(--panel); backdrop-filter: blur(22px) saturate(1.2);
-          box-shadow: 0 24px 80px rgba(0,0,0,.42), inset 0 1px rgba(255,255,255,.05);
-          color: var(--text); font: 13px/1.45 system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
-          opacity: 0; visibility: hidden; pointer-events: none;
-          transform: translateY(10px) scale(.975); transform-origin: right bottom;
-          transition: opacity .18s ease, transform .18s ease, visibility .18s;
+          position:absolute; right:0; bottom:65px; width:min(376px,calc(100vw - 24px));
+          padding:18px; border:1px solid rgba(113,139,205,.56); border-radius:24px;
+          background:
+            radial-gradient(circle at 91% 4%,rgba(94,143,235,.28),transparent 30%),
+            radial-gradient(circle at 8% 94%,rgba(94,162,132,.15),transparent 31%),
+            radial-gradient(circle at 11% 3%,rgba(154,133,210,.2),transparent 25%),
+            radial-gradient(circle at 76% 90%,rgba(231,145,180,.12),transparent 28%),
+            linear-gradient(145deg,rgba(255,255,255,.78),rgba(244,248,255,.68)),
+            var(--paper);
+          backdrop-filter:blur(26px) saturate(1.28);
+          box-shadow:0 28px 82px rgba(53,72,137,.27),0 8px 30px rgba(99,128,198,.13),inset 0 1px rgba(255,255,255,.94);
+          color:var(--ink); opacity:0; visibility:hidden; pointer-events:none;
+          transform:translateY(10px) scale(.975); transform-origin:right bottom;
+          transition:opacity .18s ease,transform .18s ease,visibility .18s;
         }
         #panel[data-open="true"] { opacity:1; visibility:visible; pointer-events:auto; transform:translateY(0) scale(1); }
-        #panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; }
-        #brand { display:flex; align-items:center; gap:10px; min-width:0; }
-        #brand-icon {
-          display:grid; place-items:center; width:38px; height:38px; flex:none; border-radius:12px;
-          background:linear-gradient(145deg,#34d399,#047857); box-shadow:inset 0 1px rgba(255,255,255,.35);
-          color:#fff; font:700 22px/1 Georgia,serif;
-        }
-        #brand-title { font-weight:750; font-size:14px; letter-spacing:.01em; }
-        #brand-subtitle { margin-top:2px; color:var(--muted); font-size:11px; }
+        #panel::before { content:"✦"; position:absolute; top:11px; right:53px; color:rgba(83,126,218,.7); font-size:13px; text-shadow:-24px 17px 0 rgba(149,128,203,.32); pointer-events:none; }
+        #panel::after { content:""; position:absolute; right:-24px; top:88px; width:68px; height:68px; border-radius:50%; background:rgba(112,155,235,.24); filter:blur(14px); pointer-events:none; }
+        #panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; cursor:grab; user-select:none; touch-action:none; }
+        #panel-head:active { cursor:grabbing; }
+        #brand { display:flex; align-items:center; gap:12px; min-width:0; }
+        #brand-icon { display:block; width:54px; height:54px; flex:none; border:2px solid rgba(255,255,255,.92); border-radius:17px; object-fit:cover; box-shadow:0 9px 22px rgba(58,83,157,.3); }
+        #brand-title { color:#303a5a; font-size:16px; font-weight:780; letter-spacing:.025em; }
+        #brand-subtitle { margin-top:3px; color:#74809d; font-size:11px; }
         #close {
-          display:grid; place-items:center; width:30px; height:30px; border:0; border-radius:9px;
-          background:transparent; color:var(--muted); cursor:pointer; font-size:19px;
+          display:grid; place-items:center; width:31px; height:31px; padding:0; border:0; border-radius:10px;
+          background:transparent; color:#927f86; cursor:pointer; font-size:19px;
         }
-        #close:hover { background:var(--surface-hover); color:var(--text); }
+        #close:hover { background:var(--blue-soft); color:#4167bd; }
         #status {
-          margin:12px 0 0; padding:8px 10px; border:1px solid rgba(16,185,129,.18);
-          border-radius:10px; background:var(--accent-soft); color:#a7f3d0; font-size:11px;
+          margin:13px 0 0; padding:8px 11px; border:1px solid rgba(105,145,216,.44); border-radius:10px;
+          background:linear-gradient(110deg,rgba(217,232,255,.9),rgba(224,242,234,.78),rgba(239,234,251,.74)); color:#354f88; font-size:11px; font-weight:650;
+          box-shadow:inset 0 1px rgba(255,255,255,.76);
         }
-        #metrics { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
-        .metric { padding:9px 10px; border:1px solid var(--border); border-radius:11px; background:var(--surface); }
-        .metric strong { display:block; color:var(--text); font-size:17px; line-height:1.1; }
+        #metrics { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:9px; }
+        .metric { padding:10px 11px; border:1px solid var(--line); border-radius:14px; background:var(--paper-strong); box-shadow:0 5px 16px rgba(83,61,86,.07),inset 0 1px rgba(255,255,255,.78); }
+        .metric:first-child { border-color:rgba(102,144,223,.44); background:linear-gradient(145deg,rgba(222,235,255,.92),rgba(255,255,255,.72)); }
+        .metric:last-child { border-color:rgba(153,133,202,.42); background:linear-gradient(145deg,rgba(236,231,251,.9),rgba(250,238,247,.68)); }
+        .metric strong { display:block; color:#33426b; font-size:17px; line-height:1.1; }
         .metric span { display:block; margin-top:3px; color:var(--muted); font-size:10px; }
-        #tabs { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin:12px 0 4px; padding:4px; border-radius:12px; background:rgba(0,0,0,.18); }
-        .tab { padding:7px 5px; border:0; border-radius:9px; background:transparent; color:var(--muted); cursor:pointer; font-weight:650; }
-        .tab[data-active="true"] { background:var(--surface-hover); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,.16); }
+        #tabs { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin:13px 0 4px; padding:4px; border:1px solid rgba(118,143,201,.36); border-radius:14px; background:rgba(72,99,160,.09); box-shadow:inset 0 1px rgba(255,255,255,.58); }
+        .tab { padding:8px 5px; border:0; border-radius:9px; background:transparent; color:#66718e; cursor:pointer; font-weight:700; }
+        .tab:hover { color:#36466f; }
+        .tab[data-active="true"] { background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(226,235,255,.9)); color:#4167bd; box-shadow:0 4px 12px rgba(63,87,153,.16),inset 0 1px #fff; }
         .pane { padding-top:4px; }
         .pane[hidden] { display:none; }
         .action {
           display:flex; align-items:center; justify-content:space-between; gap:10px;
-          width:100%; margin-top:8px; padding:10px 11px; border:1px solid var(--border);
-          border-radius:11px; background:var(--surface); color:var(--text); cursor:pointer; text-align:left;
-          transition:background .15s ease, border-color .15s ease, transform .15s ease;
+          width:100%; margin-top:8px; padding:10px 11px; border:1px solid var(--line);
+          border-radius:14px; background:linear-gradient(135deg,rgba(255,255,255,.8),rgba(255,250,251,.68)); color:var(--ink); cursor:pointer; text-align:left;
+          box-shadow:0 5px 15px rgba(83,61,86,.06),inset 0 1px rgba(255,255,255,.75);
+          transition:background .15s ease,border-color .15s ease,transform .15s ease,box-shadow .15s ease;
         }
-        .action:hover { background:var(--surface-hover); border-color:rgba(52,211,153,.32); transform:translateY(-1px); }
-        .action.primary { border-color:rgba(52,211,153,.32); background:linear-gradient(135deg,rgba(16,185,129,.24),rgba(5,150,105,.14)); }
-        .action-copy { color:var(--muted); font-size:11px; }
-        .field { display:block; margin-top:8px; color:var(--muted); font-size:11px; }
+        .action:hover { background:rgba(255,255,255,.95); border-color:rgba(76,121,215,.6); transform:translateY(-2px); box-shadow:0 9px 22px rgba(59,82,151,.14); }
+        .action.primary { border-color:rgba(93,136,219,.48); background:linear-gradient(120deg,rgba(215,231,255,.94),rgba(224,243,234,.78),rgba(238,232,251,.8)); }
+        .action-copy { padding:2px 7px; border-radius:999px; background:linear-gradient(135deg,rgba(213,228,255,.82),rgba(232,225,248,.76)); color:#536a9f; font-size:10px; }
+        .field { display:block; margin-top:8px; color:#56617e; font-size:11px; font-weight:650; }
         #format {
-          width:100%; margin-top:5px; padding:9px 10px; border:1px solid var(--border);
-          border-radius:10px; background:#20262f; color:var(--text); cursor:pointer;
+          width:100%; margin-top:6px; padding:9px 10px; border:1px solid var(--line);
+          border-radius:12px; background:rgba(255,255,255,.72); color:var(--ink); cursor:pointer; font-weight:500;
+          box-shadow:inset 0 1px rgba(255,255,255,.86);
         }
-        .switch-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 1px; border-bottom:1px solid rgba(255,255,255,.07); }
-        .switch-copy strong { display:block; font-size:12px; }
-        .switch-copy span { display:block; margin-top:2px; color:var(--muted); font-size:10px; }
+        .switch-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 2px; border-bottom:1px solid rgba(126,148,198,.24); }
+        .switch-copy strong { display:block; color:#414d70; font-size:12px; }
         .switch {
-          position:relative; width:38px; height:22px; flex:none; padding:0; border:0; border-radius:999px;
-          background:#4b5563; cursor:pointer; transition:background .18s ease;
+          position:relative; width:39px; height:23px; flex:none; padding:0; border:0; border-radius:999px;
+          background:#aeb8cf; cursor:pointer; transition:background .18s ease;
         }
-        .switch::after { content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.3); transition:transform .18s ease; }
-        .switch[data-on="true"] { background:var(--accent); }
+        .switch::after { content:""; position:absolute; top:3px; left:3px; width:17px; height:17px; border-radius:50%; background:#fffdf9; box-shadow:0 2px 5px rgba(88,68,75,.2); transition:transform .18s ease; }
+        .switch[data-on="true"] { background:linear-gradient(90deg,#527bd6,#8877be); }
         .switch[data-on="true"]::after { transform:translateX(16px); }
-        .hint { margin:10px 1px 0; color:var(--muted); font-size:10px; line-height:1.5; }
         #diagnostic-text {
-          width:100%; height:112px; margin-top:8px; padding:8px; border:1px solid var(--border);
-          border-radius:10px; resize:vertical; background:#080b0f; color:#e5e7eb; font:10px/1.4 Consolas,monospace;
+          width:100%; height:112px; margin-top:8px; padding:8px; border:1px solid var(--line);
+          border-radius:10px; resize:vertical; background:#f3ede8; color:var(--ink); font:10px/1.4 Consolas,monospace;
         }
-        #diagnostic-text[hidden] { display: none; }
-        #footer { margin:11px 1px 0; color:#6b7280; font-size:9px; text-align:center; }
-
-        :host {
-          color-scheme: light;
-          --accent: #79ad98;
-          --accent-strong: #5f927f;
-          --accent-soft: #eaf6f0;
-          --panel: #fffaf4;
-          --panel-2: #fff4f6;
-          --surface: rgba(255,255,255,.78);
-          --surface-hover: #fff;
-          --border: #eadfe0;
-          --text: #4f4a50;
-          --muted: #93878e;
-        }
-        #launcher {
-          min-height: 44px; padding: 7px 11px 7px 7px;
-          border-color: #ead9dc;
-          background: linear-gradient(135deg, #fffdf9 0%, #fff2f4 55%, #edf8f2 100%);
-          box-shadow: 0 9px 26px rgba(121,91,101,.16), inset 0 1px #fff;
-          color: #665b62;
-        }
-        #launcher:hover { filter:none; transform:translateY(-2px) rotate(-.4deg); box-shadow:0 13px 31px rgba(121,91,101,.2); }
-        #launcher[data-enabled="false"] { background:#f4f0ef; color:#9d9698; }
-        #launcher-icon {
-          background: linear-gradient(145deg,#f6c4cf,#ef9fb2);
-          color:#fff; box-shadow:inset 0 1px rgba(255,255,255,.7), 0 3px 8px rgba(215,132,153,.22);
-        }
-        #launcher-count { background:#e9f5ef; color:#628e7d; }
-        #launcher:focus-visible, button:focus-visible, select:focus-visible { outline-color:#e79daf; }
-        #panel {
-          width:min(372px,calc(100vw - 24px)); padding:16px;
-          border-color:#ead9dc; border-radius:24px;
-          background:
-            radial-gradient(circle at 92% 5%,rgba(246,196,207,.36),transparent 23%),
-            radial-gradient(circle at 7% 92%,rgba(181,222,205,.30),transparent 28%),
-            var(--panel);
-          backdrop-filter:blur(18px) saturate(1.06);
-          box-shadow:0 24px 64px rgba(107,82,91,.23),inset 0 1px rgba(255,255,255,.95);
-          color:var(--text);
-        }
-        #panel::before {
-          content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; opacity:.24;
-          background-image:radial-gradient(#d9bbbF 0.55px,transparent 0.55px);
-          background-size:7px 7px;
-        }
-        #panel > * { position:relative; z-index:1; }
-        #brand-icon {
-          border-radius:14px; background:linear-gradient(145deg,#f7cbd4,#eda6b7);
-          box-shadow:inset 0 1px rgba(255,255,255,.75),0 5px 12px rgba(213,131,152,.18);
-        }
-        #brand-title { color:#594f55; font-size:15px; }
-        #brand-subtitle { color:#a08f98; letter-spacing:.02em; }
-        #close { color:#aa969e; }
-        #close:hover { background:#fff0f3; color:#cf7f94; }
-        #status {
-          border-color:#cfe7db; background:rgba(234,246,240,.86); color:#608a79;
-        }
-        .metric { border-color:#eadfe0; background:rgba(255,255,255,.72); box-shadow:0 3px 10px rgba(110,85,94,.05); }
-        .metric:first-child { background:rgba(236,248,243,.84); }
-        .metric:last-child { background:rgba(255,240,243,.82); }
-        .metric strong { color:#61565d; }
-        #tabs { background:rgba(238,229,229,.62); }
-        .tab { color:#9a8c93; }
-        .tab[data-active="true"] { background:#fffdf9; color:#6f625f; box-shadow:0 3px 9px rgba(112,86,95,.1); }
-        .action {
-          border-color:#eadfe0; border-radius:13px; background:rgba(255,255,255,.72); color:#5e555a;
-          box-shadow:0 2px 8px rgba(116,88,98,.04);
-        }
-        .action:hover { background:#fff; border-color:#e8bdc7; box-shadow:0 7px 15px rgba(121,91,101,.09); transform:translateY(-2px); }
-        .action.primary { border-color:#cde3d9; background:linear-gradient(135deg,#edf8f3,#fff8f4); }
-        .action-copy { padding:2px 7px; border-radius:999px; background:#f7eff0; color:#9b8189; }
-        .field { color:#8f8288; }
-        #format { border-color:#e6dadd; background:#fffdf9; color:#62575d; }
-        .switch-row { border-bottom-color:#eee4e3; }
-        .switch-copy strong { color:#61565d; }
-        .switch { background:#d8cdcf; }
-        .switch::after { box-shadow:0 2px 5px rgba(88,68,75,.18); }
-        .switch[data-on="true"] { background:#83b59f; }
-        #diagnostic-text { border-color:#e3d6d8; background:#fffdf9; color:#62575d; }
-        #footer { color:#ac9ea4; }
+        #diagnostic-text[hidden] { display:none; }
+        #footer { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:3px 6px; margin:12px 1px 0; color:#7c86a0; font-size:9px; text-align:center; }
+        #permission-help { padding:0; border:0; background:transparent; color:#5272b9; cursor:pointer; font-size:9px; text-decoration:underline; text-underline-offset:2px; }
+        #permission-help:hover { color:#3459a8; }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration:.01ms!important; animation-duration:.01ms!important; } }
       </style>
       <div id="panel" data-open="false" aria-hidden="true">
         <div id="panel-head">
-          <div id="brand"><span id="brand-icon">Σ</span><div><div id="brand-title">公式小站</div><div id="brand-subtitle">复制 LaTeX · 收好对话</div></div></div>
+          <div id="brand"><img id="brand-icon" src="${CONTROL_ICON_DATA_URL}" alt=""><div><div id="brand-title">公式复制</div><div id="brand-subtitle">对话提取</div></div></div>
           <button id="close" type="button" aria-label="关闭面板">×</button>
         </div>
         <p id="status"></p>
         <div id="metrics"><div class="metric"><strong id="formula-metric">0</strong><span>页内公式</span></div><div class="metric"><strong id="message-metric">0</strong><span>对话消息</span></div></div>
         <div id="tabs" role="tablist" aria-label="工具分类">
-          <button class="tab" type="button" role="tab" data-tab="copy" data-active="true" aria-selected="true">复制</button>
-          <button class="tab" type="button" role="tab" data-tab="export" data-active="false" aria-selected="false">整理</button>
+          <button class="tab" type="button" role="tab" data-tab="copy" data-active="true" aria-selected="true">公式复制</button>
+          <button class="tab" type="button" role="tab" data-tab="export" data-active="false" aria-selected="false">对话提取</button>
           <button class="tab" type="button" role="tab" data-tab="settings" data-active="false" aria-selected="false">设置</button>
         </div>
         <section class="pane" role="tabpanel" data-pane="copy">
@@ -1150,28 +1061,28 @@
         <section class="pane" role="tabpanel" data-pane="export" hidden>
           <button id="copy-selection-markdown" class="action" type="button"><span>复制选中内容</span><span class="action-copy">Markdown</span></button>
           <button id="copy-last-response" class="action" type="button"><span>复制最近回答</span><span class="action-copy">Markdown</span></button>
-          <button id="copy-last-code" class="action" type="button"><span>复制最近代码</span><span class="action-copy">纯代码</span></button>
-          <button id="copy-all-code" class="action" type="button"><span>复制全部代码</span><span class="action-copy">Markdown</span></button>
           <button id="copy-conversation" class="action" type="button"><span>复制整段对话</span><span class="action-copy">Markdown</span></button>
           <button id="download-conversation" class="action primary" type="button"><span>保存为 Markdown</span><span class="action-copy">.md ↓</span></button>
-          <div class="switch-row"><div class="switch-copy"><strong>附上来源与时间</strong><span>放在文档开头</span></div><button id="metadata-toggle" class="switch" type="button" role="switch" aria-label="附上来源与时间"></button></div>
+          <div class="switch-row"><div class="switch-copy"><strong>附上来源与时间</strong></div><button id="metadata-toggle" class="switch" type="button" role="switch" aria-label="附上来源与时间"></button></div>
         </section>
         <section class="pane" role="tabpanel" data-pane="settings" hidden>
-          <div class="switch-row"><div class="switch-copy"><strong>点按公式复制</strong><span>轻点一下，马上复制</span></div><button id="toggle" class="switch" type="button" role="switch" aria-label="点按公式复制"></button></div>
-          <div class="switch-row"><div class="switch-copy"><strong>整段复制</strong><span>文字和公式一起带走</span></div><button id="selection-toggle" class="switch" type="button" role="switch" aria-label="整段复制"></button></div>
+          <div class="switch-row"><div class="switch-copy"><strong>点按公式复制</strong></div><button id="toggle" class="switch" type="button" role="switch" aria-label="点按公式复制"></button></div>
+          <div class="switch-row"><div class="switch-copy"><strong>整段复制</strong></div><button id="selection-toggle" class="switch" type="button" role="switch" aria-label="整段复制"></button></div>
           <button id="diagnostic" class="action" type="button"><span>复制排查信息</span><span class="action-copy">遇到问题时</span></button>
           <textarea id="diagnostic-text" readonly hidden aria-label="公式诊断信息"></textarea>
         </section>
-        <div id="footer">只在本机整理 · 不上传</div>
+        <div id="footer"><span>只在本机整理 · 不上传</span><button id="permission-help" type="button">油猴版没显示？复制权限页地址</button></div>
       </div>
       <button id="launcher" type="button" aria-expanded="false">
-        <span id="launcher-icon">Σ</span><span>公式小站</span><span id="launcher-count">0</span>
+        <img id="launcher-icon" src="${CONTROL_ICON_DATA_URL}" alt=""><span>公式复制</span><span id="launcher-count">0</span>
       </button>
     `;
 
     const launcher = controlShadow.getElementById("launcher");
     const panel = controlShadow.getElementById("panel");
+    const panelHead = controlShadow.getElementById("panel-head");
     const close = controlShadow.getElementById("close");
+    const permissionHelp = controlShadow.getElementById("permission-help");
     const test = controlShadow.getElementById("test");
     const diagnostic = controlShadow.getElementById("diagnostic");
     const diagnosticText = controlShadow.getElementById("diagnostic-text");
@@ -1181,8 +1092,6 @@
     const format = controlShadow.getElementById("format");
     const copySelectionMarkdown = controlShadow.getElementById("copy-selection-markdown");
     const copyLastResponse = controlShadow.getElementById("copy-last-response");
-    const copyLastCode = controlShadow.getElementById("copy-last-code");
-    const copyAllCode = controlShadow.getElementById("copy-all-code");
     const copyConversation = controlShadow.getElementById("copy-conversation");
     const downloadConversation = controlShadow.getElementById("download-conversation");
 
@@ -1190,6 +1099,54 @@
       setPanelOpen(panel.dataset.open !== "true");
     });
     close.addEventListener("click", () => setPanelOpen(false));
+    let panelDrag = null;
+    panelHead.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0 || event.target.closest("button")) return;
+      const rect = panel.getBoundingClientRect();
+      panel.style.position = "fixed";
+      panel.style.left = `${rect.left}px`;
+      panel.style.top = `${rect.top}px`;
+      panel.style.right = "auto";
+      panel.style.bottom = "auto";
+      panelDrag = {
+        pointerId: event.pointerId,
+        offsetX: event.clientX - rect.left,
+        offsetY: event.clientY - rect.top,
+        width: rect.width,
+        height: rect.height
+      };
+      panelHead.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+    panelHead.addEventListener("pointermove", (event) => {
+      if (!panelDrag || event.pointerId !== panelDrag.pointerId) return;
+      const left = Math.min(
+        Math.max(8, event.clientX - panelDrag.offsetX),
+        Math.max(8, window.innerWidth - panelDrag.width - 8)
+      );
+      const top = Math.min(
+        Math.max(8, event.clientY - panelDrag.offsetY),
+        Math.max(8, window.innerHeight - panelDrag.height - 8)
+      );
+      panel.style.left = `${left}px`;
+      panel.style.top = `${top}px`;
+    });
+    const finishPanelDrag = (event) => {
+      if (!panelDrag || event.pointerId !== panelDrag.pointerId) return;
+      if (panelHead.hasPointerCapture(event.pointerId)) panelHead.releasePointerCapture(event.pointerId);
+      panelDrag = null;
+    };
+    panelHead.addEventListener("pointerup", finishPanelDrag);
+    panelHead.addEventListener("pointercancel", finishPanelDrag);
+    permissionHelp.addEventListener("click", async () => {
+      try {
+        await copyLatex("chrome://extensions");
+        showToast("已复制 chrome://extensions，请打开 Tampermonkey 详情并允许用户脚本");
+      } catch (error) {
+        console.error("[ChatGPT Formula Copy] 权限页地址复制失败", error);
+        showToast("请手动打开 chrome://extensions", true);
+      }
+    });
     controlShadow.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         setPanelOpen(false);
@@ -1288,36 +1245,6 @@
       }
     });
 
-    copyLastCode.addEventListener("click", async () => {
-      const code = lastAssistantCode();
-      if (!code) {
-        showToast("当前回答里没有代码", true);
-        return;
-      }
-      try {
-        await copyLatex(code);
-        showToast("最新代码已复制");
-      } catch (error) {
-        console.error("[ChatGPT Formula Copy] 最新代码复制失败", error);
-        showToast("复制失败，请检查剪贴板权限", true);
-      }
-    });
-
-    copyAllCode.addEventListener("click", async () => {
-      const blocks = collectAssistantCodeBlocks();
-      if (!blocks.length) {
-        showToast("当前对话里没有代码", true);
-        return;
-      }
-      try {
-        await copyLatex(blocks.map(({ markdown }) => markdown).join("\n\n"));
-        showToast(`已复制 ${blocks.length} 个代码块`);
-      } catch (error) {
-        console.error("[ChatGPT Formula Copy] 全部代码复制失败", error);
-        showToast("复制失败，请检查剪贴板权限", true);
-      }
-    });
-
     copyConversation.addEventListener("click", async () => {
       const messages = collectConversationMessages();
       const markdown = buildConversationMarkdown(messages);
@@ -1365,7 +1292,7 @@
       setPanelOpen(true);
     }
     if (firstRun) {
-      showToast("公式小站已就绪");
+      showToast("公式复制已就绪");
     }
   }
 
@@ -1465,7 +1392,7 @@
       }, { once: true });
       installControlObservers();
     }
-    console.info("[ChatGPT 公式小站] initialized", location.href);
+    console.info("[ChatGPT 公式复制] initialized", location.href);
   }
 
   if (document.documentElement) {
@@ -1486,9 +1413,6 @@
     selectionToMarkdown,
     serializeElementToMarkdown,
     collectConversationMessages,
-    collectAssistantCodeBlocks,
-    allAssistantCodeMarkdown,
-    lastAssistantCode,
     buildConversationMarkdown,
     lastAssistantMarkdown,
     safeMarkdownFilename,

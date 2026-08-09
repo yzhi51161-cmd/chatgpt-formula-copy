@@ -33,7 +33,7 @@ const chromePath = process.env.CHROME_PATH;
     await page.addScriptTag({ path: userscriptPath });
     const launcher = page.locator("#gpt-formula-copy-control #launcher");
     assert.equal(await launcher.isVisible(), true, "常驻“公式复制”按钮应可见");
-    assert.match(await launcher.innerText(), /公式小站/, "按钮应显示新版功能名称");
+    assert.match(await launcher.innerText(), /公式复制/, "按钮应显示新版功能名称");
 
     await page.locator("#inline .mord").hover();
     const hoverStyle = await page.locator("#inline").evaluate((element) => ({
@@ -45,6 +45,20 @@ const chromePath = process.env.CHROME_PATH;
 
     await launcher.click();
     await page.locator("#gpt-formula-copy-control #panel").waitFor({ state: "visible" });
+    const permissionHelp = page.locator("#gpt-formula-copy-control #permission-help");
+    assert.match(await permissionHelp.innerText(), /复制权限页地址/);
+    const panel = page.locator("#gpt-formula-copy-control #panel");
+    const panelHead = page.locator("#gpt-formula-copy-control #panel-head");
+    assert.equal(await panelHead.evaluate((element) => getComputedStyle(element).cursor), "grab");
+    const beforeDrag = await panel.boundingBox();
+    const headBox = await panelHead.boundingBox();
+    await page.mouse.move(headBox.x + 70, headBox.y + 20);
+    await page.mouse.down();
+    await page.mouse.move(headBox.x - 30, headBox.y - 40);
+    await page.mouse.up();
+    const afterDrag = await panel.boundingBox();
+    assert.ok(afterDrag.x < beforeDrag.x, "面板标题栏应支持拖动");
+    assert.ok(afterDrag.x >= 8 && afterDrag.y >= 8, "拖动后面板应留在可视区域内");
     assert.equal(
       await page.locator("#gpt-formula-copy-control #panel").isVisible(),
       true,
@@ -108,18 +122,10 @@ const chromePath = process.env.CHROME_PATH;
       selection.removeAllRanges();
       return {
         selectionMarkdown,
-        blocks: api.collectAssistantCodeBlocks(),
-        lastCode: api.lastAssistantCode(),
-        allCode: api.allAssistantCodeMarkdown()
       };
     });
     assert.match(materialTools.selectionMarkdown, /\*\*缩放点积注意力\*\*/);
     assert.match(materialTools.selectionMarkdown, /\$\\alpha\+\\beta\$/);
-    assert.equal(materialTools.blocks.length, 2, "应收集当前对话内两个 assistant 代码块");
-    assert.equal(materialTools.blocks[0].language, "python");
-    assert.equal(materialTools.lastCode, "quoted()\nnext()");
-    assert.match(materialTools.allCode, /```python\ndef attention\(q, k\):/);
-    assert.match(materialTools.allCode, /```\nquoted\(\)\nnext\(\)\n```/);
 
     const selectionCopy = await page.evaluate(() => {
       const range = document.createRange();
@@ -223,7 +229,7 @@ const chromePath = process.env.CHROME_PATH;
       requestAnimationFrame(check);
     }));
     await launcher.waitFor({ state: "visible", timeout: 1000 });
-    assert.match(await launcher.innerText(), /公式小站/, "控制按钮被页面移除后应自动恢复");
+    assert.match(await launcher.innerText(), /公式复制/, "控制按钮被页面移除后应自动恢复");
     assert.ok(restoreMs < 500, `控制按钮应快速恢复，实际 ${restoreMs.toFixed(1)}ms`);
 
     await page.locator("#inline .mord").click();
@@ -346,18 +352,6 @@ const chromePath = process.env.CHROME_PATH;
       (await page.evaluate(() => globalThis.__copiedLatex)).at(-1).text,
       markdownExport.assistant,
       "最后回答应复制为 Markdown"
-    );
-    await page.locator("#gpt-formula-copy-control #copy-last-code").click();
-    assert.equal(
-      (await page.evaluate(() => globalThis.__copiedLatex)).at(-1).text,
-      "quoted()\nnext()",
-      "最新代码应复制为无围栏纯代码"
-    );
-    await page.locator("#gpt-formula-copy-control #copy-all-code").click();
-    assert.equal(
-      (await page.evaluate(() => globalThis.__copiedLatex)).at(-1).text,
-      materialTools.allCode,
-      "全部代码应复制为带语言信息的 Markdown"
     );
 
     const downloadPromise = page.waitForEvent("download");

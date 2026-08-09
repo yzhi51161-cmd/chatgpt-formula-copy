@@ -18,7 +18,12 @@ const chromePath = process.env.CHROME_PATH;
       globalThis.__popupMessages = [];
       globalThis.__createdTabs = [];
       globalThis.__popupClosed = false;
+      globalThis.__copiedText = "";
       globalThis.close = () => { globalThis.__popupClosed = true; };
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: { async writeText(text) { globalThis.__copiedText = text; } }
+      });
       globalThis.chrome = {
         tabs: {
           async query() {
@@ -47,6 +52,9 @@ const chromePath = process.env.CHROME_PATH;
     assert.equal(await page.locator("#formula-count").innerText(), "8");
     assert.equal(await page.locator("#message-count").innerText(), "6");
     assert.match(await page.locator("#connection-detail").innerText(), /v5\.0\.0/);
+    await page.locator("#userscript-help").click();
+    assert.equal(await page.evaluate(() => globalThis.__copiedText), "chrome://extensions");
+    assert.match(await page.locator("#userscript-help").innerText(), /已复制/);
 
     await page.locator("#open-export").click();
     const popupAction = await page.evaluate(() => ({
