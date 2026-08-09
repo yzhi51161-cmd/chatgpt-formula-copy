@@ -113,7 +113,9 @@ def main() -> None:
         resize_icon(master, size).save(output, optimize=True)
         print(output)
 
-    update_userscript_icon(ICONS_DIR / "icon-48.png")
+    # The in-page logo is rendered up to 64 CSS pixels. Embed a 128px source so
+    # it stays crisp on high-DPI displays instead of enlarging the 48px icon.
+    update_userscript_icon(ICONS_DIR / "icon-128.png")
     print(USERSCRIPT_PATH)
 
 

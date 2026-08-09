@@ -1,6 +1,6 @@
 # ChatGPT Formula Copy v5.0.0
 
-v5.0.0 brings formula copying, mixed-selection conversion, and Markdown conversation export into one compact, draggable panel with a softer translucent blue design and a larger icon.
+v5.0.0 brings formula copying, mixed-selection conversion, and Markdown conversation export into one compact, draggable panel with lighter typography, softer translucent frames, and a crisp high-DPI icon.
 
 ## Install
 
@@ -17,6 +17,7 @@ The Userscript does not create a separate browser toolbar icon. Refresh ChatGPT 
 - Choose automatic `$` / `$$`, always-inline, or raw LaTeX output.
 - Copy a selection, the latest answer, or the full conversation as Markdown.
 - Use **提取对话内容为md** to download the current conversation as an `.md` file.
+- Switch between Chinese and English UI from Settings; the choice is stored locally.
 - Preserve headings, lists, quotes, code blocks, tables, links, images, and formulas in exports.
 - Use the compact permission helper at the bottom of the panel when troubleshooting Tampermonkey setup.
 - Process all page content locally without uploads or remote code.

@@ -28,7 +28,8 @@ Recent ChatGPT frontend changes can make formulas selectable without exposing th
 - Copies the latest answer or the full current conversation as Markdown.
 - Downloads `.md` files while preserving headings, emphasis, lists, quotes, code blocks, tables, links, image references, and LaTeX.
 - Uses linear formula deduplication, a reusable clipboard fallback, and event-driven control recovery instead of polling; formula source is read at interaction time so streaming updates never return stale LaTeX.
-- Provides a compact, translucent blue three-tab panel with a larger local icon.
+- Provides a compact translucent panel with lighter typography, more breathing room, and a high-resolution local icon.
+- Switches instantly between Chinese and English UI from Settings and stores the choice locally.
 - Makes no network requests. Formula/message elements are counted locally; content is converted only when the user runs an action.
 
 ## Install

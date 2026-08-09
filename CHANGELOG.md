@@ -5,7 +5,8 @@
 - Redesigned the in-page control as an animated Copy / Export / Settings toolkit.
 - Added Markdown copy for the latest assistant response and the full current conversation.
 - Added Markdown copy for the current selection and a focused conversation-extraction pane.
-- Reworked the draggable page panel into a compact, translucent blue visual style with a larger local icon and shorter UI copy.
+- Reworked the draggable page panel with lighter typography, more breathing room, softer translucent frames, and a high-DPI icon generated from the original 1254px artwork.
+- Added a persistent Chinese / English UI switch in Settings, including localized status and toast messages.
 - Added local `.md` downloads preserving headings, emphasis, lists, quotes, code blocks, tables, links, image references, and LaTeX.
 - Replaced the 1.2-second UI recovery poll with targeted `MutationObserver` recovery.
 - Added a reusable clipboard textarea and linear top-level formula deduplication; formula source and display mode stay live for streaming answers.

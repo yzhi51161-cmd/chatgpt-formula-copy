@@ -65,6 +65,17 @@ const chromePath = process.env.CHROME_PATH;
       "控制面板应能主动打开"
     );
 
+    await page.locator('#gpt-formula-copy-control [data-tab="settings"]').click();
+    const languageToggle = page.locator("#gpt-formula-copy-control #language-toggle");
+    await languageToggle.click();
+    assert.equal(await page.locator("#gpt-formula-copy-control #brand-title").innerText(), "Formula Copy");
+    assert.equal(await page.locator('#gpt-formula-copy-control [data-tab="export"]').innerText(), "Export");
+    assert.equal(await page.evaluate(() => globalThis.__gmValues.uiLanguage), "en", "英语 UI 选择应持久化");
+    await languageToggle.click();
+    assert.equal(await page.locator("#gpt-formula-copy-control #brand-title").innerText(), "公式复制");
+    assert.equal(await page.evaluate(() => globalThis.__gmValues.uiLanguage), "zh", "中文 UI 选择应持久化");
+    await page.locator('#gpt-formula-copy-control [data-tab="copy"]').click();
+
     const formatSelect = page.locator("#gpt-formula-copy-control #format");
     await formatSelect.selectOption("inline");
     await formatSelect.selectOption("raw");
