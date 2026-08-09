@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         ChatGPT 公式一键复制
 // @namespace    chatgpt-formula-copy.share
-// @version      4.0.0
+// @version      4.1.0
 // @license      MIT
-// @description  单击 ChatGPT 公式即可复制规整的 LaTeX，支持智能 Markdown 分隔符和原始源码模式。
+// @description  单击公式或复制含公式的选区，即可获得规整的 LaTeX / Markdown 数学文本。
 // @homepageURL  https://github.com/yzhi51161-cmd/chatgpt-formula-copy
 // @supportURL   https://github.com/yzhi51161-cmd/chatgpt-formula-copy/issues
 // @downloadURL  https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js
@@ -123,8 +123,28 @@
       console.warn("[ChatGPT LaTeX Copy] 无法保存复制格式", error);
     }
   }
+
+  function loadSelectionCopyEnabled() {
+    try {
+      return typeof GM_getValue === "function"
+        ? GM_getValue("selectionCopyEnabled", true) !== false
+        : true;
+    } catch (error) {
+      return true;
+    }
+  }
+
+  function saveSelectionCopyEnabled(value) {
+    try {
+      if (typeof GM_setValue === "function") GM_setValue("selectionCopyEnabled", value);
+    } catch (error) {
+      console.warn("[ChatGPT LaTeX Copy] 无法保存选区复制设置", error);
+    }
+  }
+
   let toastTimer = 0;
   let copyEnabled = true;
+  let selectionCopyEnabled = loadSelectionCopyEnabled();
   let copyFormat = loadCopyFormat();
   let controlShadow = null;
   let lastFormulaDiagnostic = "";
@@ -219,6 +239,112 @@
       ? `$$${compact}$$`
       : `$${compact}$`;
   }
+
+  const BLOCK_TAGS = new Set([
+    "ADDRESS", "ARTICLE", "ASIDE", "BLOCKQUOTE", "DD", "DIV", "DL", "DT",
+    "FIGCAPTION", "FIGURE", "FOOTER", "H1", "H2", "H3", "H4", "H5", "H6",
+    "HEADER", "HR", "LI", "MAIN", "NAV", "OL", "P", "PRE", "SECTION",
+    "TABLE", "TBODY", "TFOOT", "THEAD", "TR", "UL"
+  ]);
+  const SKIP_SELECTION_TAGS = new Set(["BUTTON", "NOSCRIPT", "SCRIPT", "STYLE"]);
+
+  function serializeSelectionNode(node, preserveWhitespace = false) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const value = node.nodeValue || "";
+      return preserveWhitespace ? value : value.replace(/[\t\r\n ]+/g, " ");
+    }
+    if (!(node instanceof Element)) {
+      return Array.from(
+        node.childNodes || [],
+        (child) => serializeSelectionNode(child, preserveWhitespace)
+      ).join("");
+    }
+
+    if (SKIP_SELECTION_TAGS.has(node.tagName)) return "";
+    if (node.getAttribute("aria-hidden") === "true") return "";
+    if (node.tagName === "BR") return "\n";
+    if (node.tagName === "HR") return "\n---\n";
+
+    const keepWhitespace = preserveWhitespace || node.tagName === "PRE";
+    const content = Array.from(
+      node.childNodes,
+      (child) => serializeSelectionNode(child, keepWhitespace)
+    ).join("");
+    if (node.tagName === "TD" || node.tagName === "TH") return `${content}\t`;
+    if (node.tagName === "LI") return `\n- ${content.trim()}\n`;
+    return BLOCK_TAGS.has(node.tagName) ? `\n${content}\n` : content;
+  }
+
+  function normalizeSelectionText(value) {
+    return String(value ?? "")
+      .replace(/\u00a0/g, " ")
+      .replace(/[ \t]+\n/g, "\n")
+      .replace(/\n[ \t]+/g, "\n")
+      .replace(/[ \t]{2,}/g, " ")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
+  function closestFormula(node) {
+    const element = node instanceof Element ? node : node?.parentElement;
+    return element?.closest?.(FORMULA_SELECTOR) || null;
+  }
+
+  function convertSelectionToLatex(selection = globalThis.getSelection?.()) {
+    if (!selection || selection.isCollapsed || selection.rangeCount !== 1) return null;
+
+    const range = selection.getRangeAt(0);
+    const fragment = range.cloneContents();
+    const candidates = Array.from(fragment.querySelectorAll(FORMULA_SELECTOR))
+      .map((element) => ({ element, latex: extractLatex(element) }))
+      .filter((entry) => entry.latex);
+    const formulaEntries = candidates.filter(({ element }) =>
+      !candidates.some((other) => other.element !== element && other.element.contains(element))
+    );
+
+    for (const { element, latex } of formulaEntries) {
+      element.replaceWith(document.createTextNode(formatLatexForCopy(latex, element)));
+    }
+
+    if (formulaEntries.length === 0) {
+      // 只选中公式内部若干字符时，cloneContents 不一定保留 KaTeX 外层。
+      const startFormula = closestFormula(range.startContainer);
+      const endFormula = closestFormula(range.endContainer);
+      if (startFormula && startFormula === endFormula) {
+        const latex = extractLatex(startFormula);
+        if (latex) {
+          return { text: formatLatexForCopy(latex, startFormula), formulaCount: 1 };
+        }
+      }
+      return null;
+    }
+
+    const text = normalizeSelectionText(serializeSelectionNode(fragment));
+    return text ? { text, formulaCount: formulaEntries.length } : null;
+  }
+
+  function handleSelectionCopy(event) {
+    if (!selectionCopyEnabled) return;
+    const target = event.target instanceof Element ? event.target : null;
+    if (target?.closest('input, textarea, [contenteditable="true"]')) return;
+
+    const converted = convertSelectionToLatex();
+    if (!converted) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    if (event.clipboardData) {
+      event.clipboardData.setData("text/plain", converted.text);
+    } else {
+      copyLatex(converted.text).catch((error) => {
+        console.error("[ChatGPT LaTeX Copy] 选区复制失败", error);
+      });
+    }
+    showToast(`已复制整段，${converted.formulaCount} 个公式已转为 LaTeX`);
+  }
+
   function findFormulaTarget(event) {
     const path = typeof event.composedPath === "function" ? event.composedPath() : [];
     for (const node of path) {
@@ -340,7 +466,7 @@
     }
     const descendants = Array.from(formula.querySelectorAll("*")).slice(0, 100);
     const payload = {
-      scriptVersion: "4.0.0",
+      scriptVersion: "4.1.0",
       page: `${location.origin}${location.pathname}`,
       userAgent: navigator.userAgent,
       formula: describeElement(formula),
@@ -361,15 +487,20 @@
     const launcher = controlShadow.getElementById("launcher");
     const status = controlShadow.getElementById("status");
     const toggle = controlShadow.getElementById("toggle");
+    const selectionToggle = controlShadow.getElementById("selection-toggle");
     const format = controlShadow.getElementById("format");
-    launcher.dataset.enabled = String(copyEnabled);
-    launcher.title = copyEnabled
-      ? "LaTeX 复制已启用；单击打开控制面板"
-      : "LaTeX 复制已关闭；单击打开控制面板";
-    status.textContent = message || (copyEnabled
-      ? `已启用 · ${formulaCount()} 个公式 · ${COPY_FORMAT_LABELS[copyFormat]}`
-      : "已关闭 · 单击公式不会复制");
+    launcher.dataset.enabled = String(copyEnabled || selectionCopyEnabled);
+    launcher.title = "单击打开公式复制控制面板";
+    status.textContent = message || [
+      `单击复制${copyEnabled ? "开" : "关"}`,
+      `整段复制增强${selectionCopyEnabled ? "开" : "关"}`,
+      `${formulaCount()} 个公式`,
+      COPY_FORMAT_LABELS[copyFormat]
+    ].join(" · ");
     toggle.textContent = copyEnabled ? "暂时关闭单击复制" : "重新开启单击复制";
+    selectionToggle.textContent = selectionCopyEnabled
+      ? "关闭整段复制增强"
+      : "开启整段复制增强";
     format.value = copyFormat;
   }
 
@@ -445,10 +576,11 @@
           </select>
         </label>
         <button id="test" class="action" type="button">复制示例公式</button>
+        <button id="selection-toggle" class="action" type="button"></button>
         <button id="diagnostic" class="action" type="button">复制/显示上次失败诊断</button>
         <textarea id="diagnostic-text" readonly hidden aria-label="公式诊断信息"></textarea>
         <button id="toggle" class="action" type="button"></button>
-        <p id="hint">直接单击公式即可复制；高级诊断仅在失败时使用。</p>
+        <p id="hint">可单击公式复制，也可框选整段后 Ctrl+C，公式会自动替换为 LaTeX。</p>
       </div>
       <button id="launcher" type="button" aria-expanded="false">
         <span id="dot"></span><span>公式复制</span>
@@ -462,6 +594,7 @@
     const diagnostic = controlShadow.getElementById("diagnostic");
     const diagnosticText = controlShadow.getElementById("diagnostic-text");
     const toggle = controlShadow.getElementById("toggle");
+    const selectionToggle = controlShadow.getElementById("selection-toggle");
     const format = controlShadow.getElementById("format");
 
     launcher.addEventListener("click", () => {
@@ -498,6 +631,12 @@
       refreshControlState();
       showToast(copyEnabled ? "LaTeX 单击复制已开启" : "LaTeX 单击复制已关闭");
     });
+    selectionToggle.addEventListener("click", () => {
+      selectionCopyEnabled = !selectionCopyEnabled;
+      saveSelectionCopyEnabled(selectionCopyEnabled);
+      refreshControlState();
+      showToast(selectionCopyEnabled ? "整段复制增强已开启" : "整段复制增强已关闭");
+    });
     format.addEventListener("change", () => {
       const selected = format.value;
       copyFormat = COPY_FORMAT_ORDER.includes(selected) ? selected : "smart";
@@ -524,6 +663,10 @@
 
   async function handleFormulaPointerUp(event) {
     if (!copyEnabled || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey) return;
+
+    // 用户正在拖选整段内容时不触发单击复制，交给原生 copy 事件处理。
+    const selection = globalThis.getSelection?.();
+    if (selection && !selection.isCollapsed && selection.toString().trim()) return;
 
     const formula = findFormulaTarget(event);
     if (!formula) return;
@@ -565,6 +708,7 @@
   function boot() {
     installStyles();
     window.addEventListener("pointerup", handleFormulaPointerUp, true);
+    window.addEventListener("copy", handleSelectionCopy, true);
     if (document.body) {
       ensureControl();
     } else {
@@ -587,6 +731,8 @@
     normalizeLatex,
     compactLatexSource,
     isDisplayFormula,
-    formatLatexForCopy
+    formatLatexForCopy,
+    normalizeSelectionText,
+    convertSelectionToLatex
   });
 })();

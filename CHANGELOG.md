@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.1.0 - 2026-08-09
+
+- Added mixed-selection copy: normal text is preserved while formulas become LaTeX.
+- Supports Ctrl+C and context-menu Copy for selections containing formulas.
+- Avoids triggering one-click copy while the user is dragging a text selection.
+- Added a persistent control-panel switch for selection-copy enhancement.
+
 ## 4.0.0 - 2026-08-07
 
 - Adapted formula extraction to the current ChatGPT `data-math-source` DOM.

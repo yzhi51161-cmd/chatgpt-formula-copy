@@ -1,6 +1,6 @@
 {
   "name": "chatgpt-formula-copy",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "private": true,
   "description": "One-click copy of ChatGPT formulas as clean LaTeX.",
   "license": "MIT",

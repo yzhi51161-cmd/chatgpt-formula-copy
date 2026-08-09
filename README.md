@@ -1,12 +1,12 @@
 # ChatGPT 公式一键复制
 
-[![Version](https://img.shields.io/badge/version-4.0.0-22c55e)](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/releases/tag/v4.0.0)
+[![Version](https://img.shields.io/badge/version-4.1.0-22c55e)](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/releases/latest)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Install](https://img.shields.io/badge/安装-Userscript-16a34a)](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js)
 
 [English](./README_EN.md) · [直接安装](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js) · [报告问题](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/issues/new?template=bug_report.yml)
 
-一个轻量、无网络请求的 Userscript：单击 ChatGPT 回答中的公式，即可复制规整的 LaTeX，并自动使用 `$...$` 或 `$$...$$` 包裹。
+一个轻量、无网络请求的 Userscript：既可单击公式直接复制，也可像普通文字一样框选整段后按 Ctrl+C；选区中的公式会自动替换为规整的 LaTeX，并使用 `$...$` 或 `$$...$$` 包裹。
 
 > 解决新版 ChatGPT 公式“可以选中，但复制不到原始 LaTeX”的问题。
 
@@ -18,6 +18,7 @@
 - 支持三种复制格式：Markdown 自动分隔符、始终行内分隔符、仅 LaTeX。
 - 使用 Userscript 原生剪贴板 API，避免页面 Clipboard API 的权限限制。
 - 支持流式生成和 SPA 页面更新；控制按钮被页面替换后会自动恢复。
+- 支持整段复制增强：普通文字保持原顺序，公式自动转为 LaTeX。
 - 内置窄范围公式 DOM 诊断，便于前端结构变化后的快速适配。
 
 ## 安装
@@ -32,6 +33,8 @@
 ## 使用
 
 直接单击 ChatGPT 回答中的公式。复制成功后，公式会短暂显示绿色边框，并出现提示。
+
+也可以框选一段包含文字与公式的回答，然后使用 Ctrl+C 或右键复制。脚本只在选区内检测到公式时接管复制；纯文字选区仍由浏览器正常处理。
 
 ```latex
 $a_{i,j}=q_i^\top k_j$

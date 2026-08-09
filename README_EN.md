@@ -1,12 +1,12 @@
 # ChatGPT Formula Copy
 
-[![Version](https://img.shields.io/badge/version-4.0.0-22c55e)](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/releases/tag/v4.0.0)
+[![Version](https://img.shields.io/badge/version-4.1.0-22c55e)](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/releases/latest)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Install](https://img.shields.io/badge/install-Userscript-16a34a)](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js)
 
 [简体中文](./README.md) · [Install](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js) · [Report a bug](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/issues/new?template=bug_report.yml)
 
-A lightweight, network-free Userscript for copying formulas from ChatGPT as clean LaTeX with one click. It automatically wraps inline math with `$...$` and display math with `$$...$$`.
+A lightweight, network-free Userscript for copying formulas from ChatGPT as clean LaTeX. Click a formula directly, or select mixed text and formulas and use the normal Copy command; formulas in the selection are replaced automatically.
 
 ## Why
 
@@ -19,6 +19,7 @@ Recent ChatGPT frontend changes can make formulas selectable without exposing th
 - Offers automatic Markdown delimiters, always-inline delimiters, or raw LaTeX.
 - Compacts unnecessary line breaks without changing LaTeX semantics.
 - Handles streaming responses and SPA navigation.
+- Converts formulas while copying a mixed text selection, without changing normal text-only copy behavior.
 - Makes no network requests and does not read entire conversations.
 
 ## Install
@@ -31,6 +32,8 @@ Recent ChatGPT frontend changes can make formulas selectable without exposing th
 ## Use
 
 Click any formula in a ChatGPT answer. A green outline and toast confirm a successful copy.
+
+You can also select a whole passage and press Ctrl+C or use the context-menu Copy command. Text keeps its order while formulas become Markdown-ready LaTeX.
 
 ```latex
 $a_{i,j}=q_i^\top k_j$

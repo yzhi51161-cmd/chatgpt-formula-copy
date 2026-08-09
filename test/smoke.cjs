@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
-const { chromium } = require("playwright");
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
 
 const projectRoot = path.resolve(__dirname, "..");
 const fixturePath = path.join(__dirname, "fixture.html");
@@ -57,6 +57,80 @@ const chromePath = process.env.CHROME_PATH;
       await page.evaluate(() => globalThis.__gmValues.copyFormat),
       "smart",
       "格式选择应持久化"
+    );
+
+    const selectionCopy = await page.evaluate(() => {
+      const range = document.createRange();
+      range.selectNodeContents(document.getElementById("mixed-selection"));
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      const clipboardData = new DataTransfer();
+      const event = new ClipboardEvent("copy", {
+        bubbles: true,
+        cancelable: true,
+        clipboardData
+      });
+      document.dispatchEvent(event);
+      selection.removeAllRanges();
+      return {
+        prevented: event.defaultPrevented,
+        text: clipboardData.getData("text/plain")
+      };
+    });
+    assert.deepEqual(selectionCopy, {
+      prevented: true,
+      text: "圆的方程是 $x^2+y^2=1$ ，积分结果如下：\n$$\\int_0^1 x^2\\,dx$$\n复制结束。"
+    });
+
+    const partialFormulaSelection = await page.evaluate(() => {
+      const textNode = document.querySelector("#selection-inline .katex-html").firstChild;
+      const range = document.createRange();
+      range.setStart(textNode, 0);
+      range.setEnd(textNode, 2);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      const converted = globalThis.__GPT_LATEX_COPY_API__.convertSelectionToLatex(selection);
+      selection.removeAllRanges();
+      return converted;
+    });
+    assert.deepEqual(partialFormulaSelection, {
+      text: "$x^2+y^2=1$",
+      formulaCount: 1
+    });
+
+    const plainTextCopy = await page.evaluate(() => {
+      const paragraph = document.querySelector("#mixed-selection p:last-child");
+      const range = document.createRange();
+      range.selectNodeContents(paragraph);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      const clipboardData = new DataTransfer();
+      const event = new ClipboardEvent("copy", {
+        bubbles: true,
+        cancelable: true,
+        clipboardData
+      });
+      document.dispatchEvent(event);
+      selection.removeAllRanges();
+      return event.defaultPrevented;
+    });
+    assert.equal(plainTextCopy, false, "纯文字选区不应被脚本接管");
+
+    const selectionToggle = page.locator("#gpt-formula-copy-control #selection-toggle");
+    await selectionToggle.click();
+    assert.equal(
+      await page.evaluate(() => globalThis.__gmValues.selectionCopyEnabled),
+      false,
+      "整段复制增强关闭状态应持久化"
+    );
+    await selectionToggle.click();
+    assert.equal(
+      await page.evaluate(() => globalThis.__gmValues.selectionCopyEnabled),
+      true,
+      "整段复制增强开启状态应持久化"
     );
 
     await page.locator("#gpt-formula-copy-control #test").click();
@@ -149,7 +223,7 @@ const chromePath = process.env.CHROME_PATH;
       "诊断文本框应作为手动复制后备"
     );
 
-    console.log(`smoke ok: share UI + compact math + data-math-source + diagnostics + ${copied.length} formula clipboard writes`);
+    console.log(`smoke ok: selection copy + share UI + compact math + data-math-source + diagnostics + ${copied.length} formula clipboard writes`);
   } finally {
     await browser.close();
   }
