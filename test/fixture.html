@@ -2,7 +2,7 @@
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8">
-    <title>ChatGPT LaTeX Copy Fixture</title>
+    <title>Attention Notes - ChatGPT</title>
   </head>
   <body>
     <main>
@@ -53,6 +53,57 @@
           </span>
         </span>
       </span>
+
+      <article id="message-user" data-message-author-role="user">
+        <div data-message-content>
+          <p>请用 Markdown 总结注意力机制，并保留公式和代码。</p>
+          <div class="whitespace-pre-wrap">第一行
+第二行
+
+第四行</div>
+        </div>
+      </article>
+
+      <article id="message-assistant" data-message-author-role="assistant">
+        <div class="markdown" data-message-content>
+          <h2>核心结论</h2>
+          <p>
+            使用 <strong>缩放点积注意力</strong>，行内公式为
+            <span data-math-source="\alpha+\beta"><span class="katex"><span class="katex-html" aria-hidden="true">α+β</span></span></span>。
+          </p>
+          <ul>
+            <li>保留 <em>标题</em> 和列表</li>
+            <li>保留 <a href="https://example.com/reference">参考链接</a></li>
+          </ul>
+          <pre><code class="language-python">def attention(q, k):
+    return q @ k.T</code></pre>
+          <table>
+            <thead><tr><th>符号</th><th>含义</th></tr></thead>
+            <tbody><tr><td>Q</td><td>Query</td></tr><tr><td>K</td><td>Key</td></tr></tbody>
+          </table>
+          <blockquote><p>所有导出均在本机完成。</p></blockquote>
+          <ol>
+            <li>父项<ul><li>子项</li></ul></li>
+          </ol>
+          <ul>
+            <li><input type="checkbox" checked> 已完成</li>
+            <li><input type="checkbox"> 未完成</li>
+          </ul>
+          <blockquote><pre><code>quoted()
+next()</code></pre></blockquote>
+          <p>&lt;img src="https://tracker.invalid/pixel" onerror="alert(1)"&gt;</p>
+          <img src="https://example.com/attention.png" alt="attention diagram">
+          <button type="button">不应导出</button>
+        </div>
+      </article>
+
+      <section hidden>
+        <article id="hidden-branch" data-message-author-role="assistant">
+          <div data-message-content>
+            <p>这条备用分支不应出现在当前对话导出中。</p>
+          </div>
+        </article>
+      </section>
 
       <div id="dynamic-root"></div>
     </main>

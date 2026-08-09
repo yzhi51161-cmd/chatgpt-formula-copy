@@ -1,4 +1,5 @@
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
@@ -18,7 +19,7 @@ const chromePath = process.env.CHROME_PATH;
     const page = await browser.newPage();
     await page.addInitScript(() => {
       globalThis.__copiedLatex = [];
-      globalThis.__gmValues = {};
+      globalThis.__gmValues = { welcomeShown: true };
       globalThis.GM_setClipboard = (text, type) => {
         globalThis.__copiedLatex.push({ text, type });
       };
@@ -32,7 +33,7 @@ const chromePath = process.env.CHROME_PATH;
     await page.addScriptTag({ path: userscriptPath });
     const launcher = page.locator("#gpt-formula-copy-control #launcher");
     assert.equal(await launcher.isVisible(), true, "常驻“公式复制”按钮应可见");
-    assert.equal(await launcher.innerText(), "公式复制", "按钮只显示功能名称");
+    assert.match(await launcher.innerText(), /公式小站/, "按钮应显示新版功能名称");
 
     await page.locator("#inline .mord").hover();
     const hoverStyle = await page.locator("#inline").evaluate((element) => ({
@@ -40,9 +41,10 @@ const chromePath = process.env.CHROME_PATH;
       outlineStyle: getComputedStyle(element).outlineStyle
     }));
     assert.equal(hoverStyle.cursor, "copy", "公式悬浮时应显示 copy cursor");
-    assert.equal(hoverStyle.outlineStyle, "dashed", "公式悬浮时应出现虚线高亮");
+    assert.equal(hoverStyle.outlineStyle, "solid", "公式悬浮时应出现柔和高亮");
 
     await launcher.click();
+    await page.locator("#gpt-formula-copy-control #panel").waitFor({ state: "visible" });
     assert.equal(
       await page.locator("#gpt-formula-copy-control #panel").isVisible(),
       true,
@@ -58,6 +60,66 @@ const chromePath = process.env.CHROME_PATH;
       "smart",
       "格式选择应持久化"
     );
+
+    const markdownExport = await page.evaluate(() => {
+      const api = globalThis.__GPT_LATEX_COPY_API__;
+      const assistant = api.serializeElementToMarkdown(document.querySelector("#message-assistant [data-message-content]"));
+      const messages = api.collectConversationMessages();
+      return {
+        assistant,
+        messages,
+        conversation: api.buildConversationMarkdown(messages),
+        filename: api.safeMarkdownFilename()
+      };
+    });
+    assert.equal(markdownExport.messages.length, 3, "应识别 fixture 中三条对话消息");
+    assert.match(markdownExport.assistant, /^## 核心结论/m);
+    assert.match(markdownExport.assistant, /\*\*缩放点积注意力\*\*/);
+    assert.match(markdownExport.assistant, /\$\\alpha\+\\beta\$/);
+    assert.match(markdownExport.assistant, /- 保留 \*标题\* 和列表/);
+    assert.match(markdownExport.assistant, /\[参考链接\]\(https:\/\/example\.com\/reference\)/);
+    assert.match(markdownExport.assistant, /```python\ndef attention\(q, k\):/);
+    assert.match(markdownExport.assistant, /\| 符号 \| 含义 \|/);
+    assert.match(markdownExport.assistant, /> 所有导出均在本机完成。/);
+    assert.match(markdownExport.assistant, /1\. 父项\n {3}- 子项/);
+    assert.match(markdownExport.assistant, /- \[x\] 已完成/);
+    assert.match(markdownExport.assistant, /- \[ \] 未完成/);
+    assert.match(markdownExport.assistant, /> ```\n> quoted\(\)\n> next\(\)\n> ```/);
+    assert.match(markdownExport.assistant, /&lt;img src="https:\/\/tracker\.invalid\/pixel" onerror="alert\(1\)"&gt;/);
+    assert.doesNotMatch(markdownExport.assistant, /<img src="https:\/\/tracker\.invalid\/pixel"/);
+    assert.match(markdownExport.assistant, /!\[attention diagram\]\(https:\/\/example\.com\/attention\.png\)/);
+    assert.doesNotMatch(markdownExport.assistant, /不应导出/);
+    assert.match(markdownExport.conversation, /^# Attention Notes/m);
+    assert.match(markdownExport.conversation, /^## You$/m);
+    assert.match(markdownExport.conversation, /^## ChatGPT$/m);
+    assert.doesNotMatch(markdownExport.conversation, /备用分支/);
+    assert.match(markdownExport.conversation, /第一行\n第二行\n\n第四行/);
+    assert.equal(markdownExport.filename, "Attention Notes.md");
+
+    const materialTools = await page.evaluate(() => {
+      const api = globalThis.__GPT_LATEX_COPY_API__;
+      const paragraph = document.querySelector("#message-assistant [data-message-content] p");
+      const range = document.createRange();
+      range.selectNodeContents(paragraph);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      const selectionMarkdown = api.selectionToMarkdown(selection);
+      selection.removeAllRanges();
+      return {
+        selectionMarkdown,
+        blocks: api.collectAssistantCodeBlocks(),
+        lastCode: api.lastAssistantCode(),
+        allCode: api.allAssistantCodeMarkdown()
+      };
+    });
+    assert.match(materialTools.selectionMarkdown, /\*\*缩放点积注意力\*\*/);
+    assert.match(materialTools.selectionMarkdown, /\$\\alpha\+\\beta\$/);
+    assert.equal(materialTools.blocks.length, 2, "应收集当前对话内两个 assistant 代码块");
+    assert.equal(materialTools.blocks[0].language, "python");
+    assert.equal(materialTools.lastCode, "quoted()\nnext()");
+    assert.match(materialTools.allCode, /```python\ndef attention\(q, k\):/);
+    assert.match(materialTools.allCode, /```\nquoted\(\)\nnext\(\)\n```/);
 
     const selectionCopy = await page.evaluate(() => {
       const range = document.createRange();
@@ -119,6 +181,7 @@ const chromePath = process.env.CHROME_PATH;
     });
     assert.equal(plainTextCopy, false, "纯文字选区不应被脚本接管");
 
+    await page.locator('#gpt-formula-copy-control [data-tab="settings"]').click();
     const selectionToggle = page.locator("#gpt-formula-copy-control #selection-toggle");
     await selectionToggle.click();
     assert.equal(
@@ -133,7 +196,9 @@ const chromePath = process.env.CHROME_PATH;
       "整段复制增强开启状态应持久化"
     );
 
+    await page.locator('#gpt-formula-copy-control [data-tab="copy"]').click();
     await page.locator("#gpt-formula-copy-control #test").click();
+    await page.locator('#gpt-formula-copy-control [data-tab="settings"]').click();
     await page.locator("#gpt-formula-copy-control #toggle").click();
     await page.locator("#inline .mord").click();
     assert.equal(
@@ -143,9 +208,23 @@ const chromePath = process.env.CHROME_PATH;
     );
     await page.locator("#gpt-formula-copy-control #toggle").click();
 
-    await page.locator("#gpt-formula-copy-control").evaluate((element) => element.remove());
-    await launcher.waitFor({ state: "visible", timeout: 4000 });
-    assert.equal(await launcher.innerText(), "公式复制", "控制按钮被页面移除后应自动恢复");
+    const restoreMs = await page.locator("#gpt-formula-copy-control").evaluate((element) => new Promise((resolve, reject) => {
+      const started = performance.now();
+      element.remove();
+      const check = () => {
+        if (document.getElementById("gpt-formula-copy-control")) {
+          resolve(performance.now() - started);
+        } else if (performance.now() - started > 1000) {
+          reject(new Error("控制按钮未由 MutationObserver 恢复"));
+        } else {
+          requestAnimationFrame(check);
+        }
+      };
+      requestAnimationFrame(check);
+    }));
+    await launcher.waitFor({ state: "visible", timeout: 1000 });
+    assert.match(await launcher.innerText(), /公式小站/, "控制按钮被页面移除后应自动恢复");
+    assert.ok(restoreMs < 500, `控制按钮应快速恢复，实际 ${restoreMs.toFixed(1)}ms`);
 
     await page.locator("#inline .mord").click();
     await page.locator("#data-math .visual-formula").click();
@@ -164,6 +243,23 @@ const chromePath = process.env.CHROME_PATH;
         </span>`;
     });
     await page.locator("#dynamic .mord").click();
+
+    const streamedFormula = await page.evaluate(() => {
+      const formula = document.getElementById("dynamic");
+      formula.querySelector('annotation[encoding="application/x-tex"]').textContent = "u+v";
+      formula.style.display = "block";
+      const api = globalThis.__GPT_LATEX_COPY_API__;
+      return {
+        latex: api.extractLatex(formula),
+        display: api.isDisplayFormula(formula),
+        formatted: api.formatLatexForCopy(api.extractLatex(formula), formula, "smart")
+      };
+    });
+    assert.deepEqual(streamedFormula, {
+      latex: "u+v",
+      display: true,
+      formatted: "$$u+v$$"
+    }, "同一公式 DOM 流式更新后不应返回陈旧缓存");
 
     const copied = await page.evaluate(() => globalThis.__copiedLatex);
     assert.deepEqual(copied, [
@@ -203,27 +299,137 @@ const chromePath = process.env.CHROME_PATH;
       compactAligned: "$$\\begin{aligned} \\mathbf{W}_q x_i  & = q_i \\\\ q_i^\\top k_j & = a_{i,j} \\end{aligned}$$"
     });
 
+    const largeSelection = await page.evaluate(() => {
+      const section = document.createElement("section");
+      section.id = "large-selection";
+      section.innerHTML = Array.from({ length: 250 }, (_, index) =>
+        `<span data-math-source="x_${index}"><span class="katex"><span class="katex-html" aria-hidden="true">x${index}</span></span></span>`
+      ).join(" + ");
+      document.body.appendChild(section);
+      const range = document.createRange();
+      range.selectNodeContents(section);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      const started = performance.now();
+      const converted = globalThis.__GPT_LATEX_COPY_API__.convertSelectionToLatex(selection);
+      const elapsed = performance.now() - started;
+      selection.removeAllRanges();
+      section.remove();
+      return { formulaCount: converted?.formulaCount, elapsed, length: converted?.text.length };
+    });
+    assert.equal(largeSelection.formulaCount, 250);
+    assert.ok(largeSelection.length > 1000);
+    assert.ok(largeSelection.elapsed < 1500, `250 个公式转换耗时过长：${largeSelection.elapsed.toFixed(1)}ms`);
+
+    await page.evaluate(() => {
+      const formula = document.createElement("span");
+      formula.id = "metric-formula";
+      formula.setAttribute("data-math-source", "m+n");
+      document.body.appendChild(formula);
+    });
+    await page.waitForFunction(() =>
+      document.getElementById("gpt-formula-copy-control")?.shadowRoot
+        ?.getElementById("launcher-count")?.textContent ===
+        String(globalThis.__GPT_LATEX_COPY_API__.getStatus().formulaCount)
+    );
+
+    await page.evaluate(() => globalThis.__GPT_LATEX_COPY_API__.openControlPanel("export"));
+    await page.locator("#gpt-formula-copy-control #panel").waitFor({ state: "visible" });
+    assert.equal(
+      await page.locator('#gpt-formula-copy-control [data-pane="export"]').isVisible(),
+      true,
+      "导出面板应可主动打开"
+    );
+    await page.locator("#gpt-formula-copy-control #copy-last-response").click();
+    assert.equal(
+      (await page.evaluate(() => globalThis.__copiedLatex)).at(-1).text,
+      markdownExport.assistant,
+      "最后回答应复制为 Markdown"
+    );
+    await page.locator("#gpt-formula-copy-control #copy-last-code").click();
+    assert.equal(
+      (await page.evaluate(() => globalThis.__copiedLatex)).at(-1).text,
+      "quoted()\nnext()",
+      "最新代码应复制为无围栏纯代码"
+    );
+    await page.locator("#gpt-formula-copy-control #copy-all-code").click();
+    assert.equal(
+      (await page.evaluate(() => globalThis.__copiedLatex)).at(-1).text,
+      materialTools.allCode,
+      "全部代码应复制为带语言信息的 Markdown"
+    );
+
+    const downloadPromise = page.waitForEvent("download");
+    await page.locator("#gpt-formula-copy-control #download-conversation").click();
+    const download = await downloadPromise;
+    assert.equal(download.suggestedFilename(), "Attention Notes.md");
+    const downloadedMarkdown = fs.readFileSync(await download.path(), "utf8");
+    assert.match(
+      downloadedMarkdown,
+      /> Exported from \[ChatGPT\]\(.+\) on \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/,
+      "下载文件应包含合法的动态导出时间"
+    );
+    const withoutTimestamp = (value) => value.replace(/ on \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/, "");
+    assert.equal(
+      withoutTimestamp(downloadedMarkdown),
+      withoutTimestamp(markdownExport.conversation),
+      "下载文件正文应与构建结果完全一致"
+    );
+
     await page.evaluate(() => {
       document.getElementById("dynamic-root").innerHTML += `
-        <span id="no-latex" class="katex">
-          <span class="katex-html"><span class="mord">a≠b</span></span>
-        </span>`;
+        <p>PRIVATE_DO_NOT_LEAK
+          <span id="no-latex" class="katex">
+            <span class="katex-html"><span class="mord">a≠b</span></span>
+          </span>
+        </p>`;
     });
     await page.locator("#no-latex .mord").click();
-    await launcher.click();
+    await page.evaluate(() => globalThis.__GPT_LATEX_COPY_API__.openControlPanel("settings"));
     await page.locator("#gpt-formula-copy-control #diagnostic").click();
     const diagnosticCopy = (await page.evaluate(() => globalThis.__copiedLatex)).at(-1);
     assert.equal(diagnosticCopy.type, "text");
     assert.match(diagnosticCopy.text, /ChatGPT LaTeX Copy diagnostic/);
     assert.match(diagnosticCopy.text, /no-latex/);
     assert.match(diagnosticCopy.text, /"annotationCount": 0/);
+    assert.doesNotMatch(diagnosticCopy.text, /PRIVATE_DO_NOT_LEAK/);
+    assert.doesNotMatch(diagnosticCopy.text, /"page"|"userAgent"/);
     assert.equal(
       await page.locator("#gpt-formula-copy-control #diagnostic-text").isVisible(),
       true,
       "诊断文本框应作为手动复制后备"
     );
 
-    console.log(`smoke ok: selection copy + share UI + compact math + data-math-source + diagnostics + ${copied.length} formula clipboard writes`);
+    const freshPage = await browser.newPage();
+    await freshPage.addInitScript(() => {
+      globalThis.__gmValues = {};
+      globalThis.GM_setClipboard = () => {};
+      globalThis.GM_getValue = (key, fallback) => globalThis.__gmValues[key] ?? fallback;
+      globalThis.GM_setValue = (key, value) => {
+        globalThis.__gmValues[key] = value;
+      };
+    });
+    await freshPage.goto(pathToFileURL(fixturePath).href);
+    await freshPage.addScriptTag({ path: userscriptPath });
+    assert.equal(
+      await freshPage.locator("#gpt-formula-copy-control #panel").isVisible(),
+      true,
+      "首次成功注入后应主动打开面板"
+    );
+    assert.match(
+      await freshPage.locator("#gpt-latex-copy-toast").innerText(),
+      /已就绪/,
+      "首次成功注入后应明确提示启用状态"
+    );
+    assert.equal(
+      await freshPage.evaluate(() => globalThis.__gmValues.welcomeShown),
+      true,
+      "首次引导状态应持久化"
+    );
+    await freshPage.close();
+
+    console.log(`smoke ok: v5 UI + selection + Markdown download + ${largeSelection.elapsed.toFixed(1)}ms/250 formulas + diagnostics + ${copied.length} formula clipboard writes`);
   } finally {
     await browser.close();
   }

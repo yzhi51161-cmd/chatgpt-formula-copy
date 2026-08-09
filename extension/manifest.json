@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "description": "__MSG_extensionDescription__",
   "default_locale": "zh_CN",
   "icons": {
@@ -36,4 +36,3 @@
   },
   "homepage_url": "https://github.com/yzhi51161-cmd/chatgpt-formula-copy"
 }
-

@@ -11,6 +11,23 @@ SOURCE_DIR = ROOT / "extension"
 DIST_DIR = ROOT / "dist"
 UNPACKED_DIR = DIST_DIR / "chatgpt-formula-copy-chrome"
 USERSCRIPT_PATH = ROOT / "chatgpt-latex-copy.user.js"
+CHATGPT_MATCHES = [
+    "https://chatgpt.com/*",
+    "https://*.chatgpt.com/*",
+    "https://chat.openai.com/*",
+]
+PACKAGE_FILES = [
+    "manifest.json",
+    "popup.html",
+    "popup.css",
+    "popup.js",
+    "_locales/en/messages.json",
+    "_locales/zh_CN/messages.json",
+    "icons/icon-16.png",
+    "icons/icon-32.png",
+    "icons/icon-48.png",
+    "icons/icon-128.png",
+]
 
 
 def userscript_body(source: str) -> str:
@@ -27,7 +44,41 @@ def build_content_script(source: str) -> str:
 (() => {{
   "use strict";
 
-  const defaults = {{ copyFormat: "smart", selectionCopyEnabled: true }};
+  const defaults = {{
+    copyFormat: "smart",
+    copyEnabled: true,
+    selectionCopyEnabled: true,
+    exportMetadataEnabled: true,
+    welcomeShown: false
+  }};
+  const pendingMessages = [];
+  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {{
+    if (!message || typeof message !== "object") return undefined;
+    if (
+      message.type !== "GPT_FORMULA_COPY_STATUS" &&
+      message.type !== "GPT_FORMULA_COPY_OPEN_PANEL"
+    ) return undefined;
+
+    const respond = (api) => {{
+      if (!api) {{
+        sendResponse({{ ok: false, error: "not_ready" }});
+      }} else if (message.type === "GPT_FORMULA_COPY_STATUS") {{
+        sendResponse(api.getStatus());
+      }} else {{
+        const opened = api.openControlPanel(message.tab || "copy");
+        sendResponse({{ ok: opened !== false }});
+      }}
+    }};
+
+    const api = globalThis.__GPT_LATEX_COPY_API__;
+    if (api) {{
+      respond(api);
+      return undefined;
+    }}
+    pendingMessages.push(respond);
+    return true;
+  }});
+
   chrome.storage.local.get(defaults, (stored) => {{
     const cache = {{ ...defaults, ...stored }};
     globalThis.GM_getValue = (key, fallback) =>
@@ -38,6 +89,8 @@ def build_content_script(source: str) -> str:
     }};
 
 {body}
+    const api = globalThis.__GPT_LATEX_COPY_API__;
+    for (const respond of pendingMessages.splice(0)) respond(api);
   }});
 }})();
 '''
@@ -52,6 +105,24 @@ def validate_manifest(manifest: dict, package_version: str) -> None:
         )
     if manifest.get("permissions") != ["storage"]:
         raise RuntimeError("Unexpected permissions: keep the extension at minimum permission")
+    for key in (
+        "host_permissions",
+        "optional_permissions",
+        "optional_host_permissions",
+        "externally_connectable",
+    ):
+        if manifest.get(key):
+            raise RuntimeError(f"Unexpected {key}: keep the extension at minimum permission")
+    content_scripts = manifest.get("content_scripts")
+    expected_content_scripts = [
+        {
+            "matches": CHATGPT_MATCHES,
+            "js": ["content.js"],
+            "run_at": "document_start",
+        }
+    ]
+    if content_scripts != expected_content_scripts:
+        raise RuntimeError("Unexpected content_scripts: keep the ChatGPT-only allowlist")
 
 
 def main() -> None:
@@ -70,7 +141,14 @@ def main() -> None:
         raise RuntimeError("Refusing to replace a directory outside dist")
     if UNPACKED_DIR.exists():
         shutil.rmtree(UNPACKED_DIR)
-    shutil.copytree(SOURCE_DIR, UNPACKED_DIR)
+    UNPACKED_DIR.mkdir(parents=True)
+    for relative_name in PACKAGE_FILES:
+        source_path = SOURCE_DIR / relative_name
+        if not source_path.is_file():
+            raise RuntimeError(f"Missing package file: {source_path}")
+        destination_path = UNPACKED_DIR / relative_name
+        destination_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source_path, destination_path)
 
     content = build_content_script(USERSCRIPT_PATH.read_text(encoding="utf-8"))
     (UNPACKED_DIR / "content.js").write_text(content, encoding="utf-8", newline="\n")
@@ -95,4 +173,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
