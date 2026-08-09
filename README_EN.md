@@ -10,7 +10,6 @@ A lightweight, network-free ChatGPT math-content toolkit. Formulas, selections, 
 
 <p align="center">
   <img src="./docs/ui-preview.png" width="372" alt="Formula Copy page panel">
-  <img src="./docs/popup-preview.png" width="354" alt="Formula Copy popup">
 </p>
 
 ## Why
@@ -29,16 +28,13 @@ Recent ChatGPT frontend changes can make formulas selectable without exposing th
 - Copies the latest answer or the full current conversation as Markdown.
 - Downloads `.md` files while preserving headings, emphasis, lists, quotes, code blocks, tables, links, image references, and LaTeX.
 - Uses linear formula deduplication, a reusable clipboard fallback, and event-driven control recovery instead of polling; formula source is read at interaction time so streaming updates never return stale LaTeX.
-- Provides a fresh blue, dreamlike three-tab panel with a new local icon and a Chrome popup with live connection status.
+- Provides a compact, translucent blue three-tab panel with a larger local icon.
 - Makes no network requests. Formula/message elements are counted locally; content is converted only when the user runs an action.
 
 ## Install
 
 > [!IMPORTANT]
-> **First identify whether you installed the Userscript or the standalone Chrome extension. Their permissions and toolbar behavior are different.**
->
-> - **Userscript:** On Chrome 138+ with Tampermonkey 5.3+, right-click Tampermonkey → **Manage extension** → enable **Allow User Scripts**. On older Chrome versions, enable **Developer mode** on the extensions page.
-> - **Standalone Chrome extension:** This project uses a static Manifest V3 `content_scripts` entry. It does not use Tampermonkey and does not need the “Allow User Scripts” switch. Loading the unpacked ZIP still requires Chrome Developer mode.
+> On Chrome 138+ with Tampermonkey 5.3+, right-click Tampermonkey → **Manage extension** → enable **Allow User Scripts**. On older Chrome versions, enable **Developer mode** on the extensions page.
 >
 > The Chrome warning describes Tampermonkey's ability to run user-installed scripts; it is not a remote-code permission added by this project. Only install Userscripts you trust and have reviewed.
 >
@@ -49,18 +45,6 @@ Recent ChatGPT frontend changes can make formulas selectable without exposing th
 3. Confirm installation in your Userscript manager.
 4. Enable user scripts as described above and refresh `https://chatgpt.com/`.
 5. Confirm that the **公式复制** button appears in the lower-right corner.
-
-### Chrome extension
-
-Run `npm run build:chrome` to create `dist/chatgpt-formula-copy-chrome-v5.0.0.zip`, with `manifest.json` correctly placed at the archive root. The MV3 extension uses a static content script and does not depend on Tampermonkey's user-script switch.
-
-1. Download `chatgpt-formula-copy-chrome-v5.0.0.zip` from the [v5.0.0 Release](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/releases/tag/v5.0.0).
-2. Extract the ZIP to a permanent folder.
-3. Manually enter `chrome://extensions` in the address bar. Chrome intentionally blocks ordinary webpages from opening `chrome://` links directly.
-4. Enable **Developer mode**, choose **Load unpacked**, and select the extracted folder.
-5. Open or refresh `https://chatgpt.com/`. Pin **Formula Copy** from the extensions menu if you want its toolbar icon.
-
-Developers can run `npm run build:chrome` to recreate the package. Enable either the Chrome extension or the Userscript, not both.
 
 ## Use
 
@@ -97,12 +81,11 @@ npm install
 npm test
 npm run icons
 npm run preview
-npm run build:chrome
 ```
 
-`npm test` covers the Userscript, MV3 package, mixed selections, rich Markdown export, a 250-formula performance regression, control recovery, popup messaging, and download entry points.
+`npm test` covers the Userscript, mixed selections, rich Markdown export, a 250-formula performance regression, control recovery, and download entry points.
 
-See [CHROME_WEB_STORE.md](./CHROME_WEB_STORE.md) for listing and review details, and [PRIVACY.md](./PRIVACY.md) for the privacy policy.
+See [PRIVACY.md](./PRIVACY.md) for the privacy policy.
 
 ## Contributing
 

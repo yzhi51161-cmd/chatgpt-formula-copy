@@ -12,7 +12,6 @@
 
 <p align="center">
   <img src="./docs/ui-preview.png" width="372" alt="公式复制页面面板">
-  <img src="./docs/popup-preview.png" width="354" alt="公式复制 Popup">
 </p>
 
 ## 功能
@@ -27,17 +26,14 @@
 - 支持复制最后一条 ChatGPT 回答为 Markdown。
 - 支持把当前选区整理为 Markdown。
 - 支持复制或下载完整对话为 Markdown，保留标题、粗体、列表、引用、代码块、表格、链接、图片引用和 LaTeX。
-- 与新版蓝色 Logo 协调的清新梦幻风复制 / 对话提取 / 设置面板，以及可显示当前页公式和消息数量的 Chrome Popup。
+- 与新版蓝色 Logo 协调的半透明清新梦幻风复制 / 对话提取 / 设置面板。
 - 使用线性公式去重、复用剪贴板后备节点和事件驱动恢复，降低大选区复制与页面常驻开销；每次交互重新读取公式源，避免流式回答产生陈旧结果。
 - 内置窄范围公式 DOM 诊断，便于前端结构变化后的快速适配。
 
 ## 安装
 
 > [!IMPORTANT]
-> **请先确认你安装的是油猴版还是 Chrome 扩展版，两者的权限和图标不同。**
->
-> - **油猴版：**Chrome 138+ 使用 Tampermonkey 5.3+ 时，右键 Tampermonkey 图标 → **管理扩展程序** → 打开 **允许运行用户脚本（Allow User Scripts）**。Chrome 138 以前需要开启扩展管理页右上角的 **开发者模式**。
-> - **Chrome 扩展版：**使用静态 Manifest V3 `content_scripts`，不依赖 Tampermonkey，也不需要“允许运行用户脚本”开关；从 ZIP 手动安装时仍需使用 Chrome 的“开发者模式”加载解压目录。
+> Chrome 138+ 使用 Tampermonkey 5.3+ 时，右键 Tampermonkey 图标 → **管理扩展程序** → 打开 **允许运行用户脚本（Allow User Scripts）**。Chrome 138 以前需要开启扩展管理页右上角的 **开发者模式**。
 >
 > Chrome 的警告是在说明 Tampermonkey 可以运行用户安装的脚本，并不是本项目额外申请的远程代码权限。请只安装你信任并检查过的 Userscript。
 >
@@ -52,18 +48,6 @@
 5. 页面右下角出现 **公式复制** 按钮，即表示脚本已成功运行。
 
 该权限由 Chrome 管理。权限关闭时，Tampermonkey 无法注入本脚本，因此本脚本也无法检测状态或主动弹出权限引导。UI 底部提供“复制权限页地址”入口，但它只有在脚本已能运行时才会出现。
-
-### Chrome 扩展
-
-1. 从 [v5.0.0 Release](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/releases/tag/v5.0.0) 下载 `chatgpt-formula-copy-chrome-v5.0.0.zip`。
-2. 将 ZIP 完整解压到一个固定目录。
-3. 在地址栏手动输入 `chrome://extensions`。Chrome 按设计不允许网页直接打开 `chrome://` 链接。
-4. 打开右上角 **开发者模式**，选择 **加载已解压的扩展程序**，然后选择刚才的解压目录。
-5. 打开或刷新 `https://chatgpt.com/`。如需工具栏图标，请在扩展菜单中手动固定“公式复制”。
-
-开发者也可运行 `npm run build:chrome` 重新生成 ZIP；压缩包根目录直接包含 `manifest.json`。该版本使用静态 `content_scripts`，不依赖 Tampermonkey 的“允许运行用户脚本”开关。
-
-请只启用 Chrome 扩展或 Userscript 其中一种，避免同一功能重复运行。
 
 ## 使用
 
@@ -114,12 +98,11 @@ npm install
 npm test
 npm run icons
 npm run preview
-npm run build:chrome
 ```
 
-`npm test` 会验证 Userscript、Manifest V3 构建、混合选区、Markdown 富文本导出、250 公式性能回归、控制器恢复、Popup 状态桥接和下载入口。
+`npm test` 会验证 Userscript、混合选区、Markdown 富文本导出、250 公式性能回归、控制器恢复和下载入口。
 
-Chrome Web Store 的商店文案、权限说明和审核步骤见 [CHROME_WEB_STORE.md](./CHROME_WEB_STORE.md)，隐私政策见 [PRIVACY.md](./PRIVACY.md)。
+隐私说明见 [PRIVACY.md](./PRIVACY.md)。
 
 ## 参与贡献
 

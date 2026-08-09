@@ -14,7 +14,6 @@ ChatGPT 公式复制用于把公式、选区、回答或当前对话转换为便
 - 用户主动复制的失败诊断只包含被点击公式自身的有限 DOM 信息；不包含祖先对话正文、会话路径或 User-Agent。分享诊断前仍建议自行检查内容。
 - 扩展不会出售、共享或允许人工读取用户数据。
 
-本扩展对信息的使用遵守 Chrome Web Store User Data Policy，包括 Limited Use 要求。
 
 如有隐私问题，请通过 [GitHub Issues](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/issues) 联系开发者。
 
@@ -30,6 +29,5 @@ ChatGPT Formula Copy converts formulas, selections, answers, or the current conv
 - A diagnostic copied explicitly by the user contains only limited DOM information from the clicked formula, not ancestor conversation text, conversation paths, or the User-Agent. Users should still inspect it before sharing.
 - User data is never sold, shared, or made available for human review.
 
-The use of information received from Chrome APIs adheres to the Chrome Web Store User Data Policy, including the Limited Use requirements.
 
 For privacy questions, contact the developer through [GitHub Issues](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/issues).
