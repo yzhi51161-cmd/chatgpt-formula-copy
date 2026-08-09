@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Install](https://img.shields.io/badge/install-Userscript-16a34a)](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js)
 
-[简体中文](./README.md) · [Install](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js) · [Report a bug](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/issues/new?template=bug_report.yml)
+[Install](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js) · [Report a bug](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/issues/new?template=bug_report.yml)
 
 A lightweight, network-free ChatGPT math-content toolkit. Formulas, selections, answers, and whole conversations are all available from one compact panel.
 
@@ -39,13 +39,13 @@ Recent ChatGPT frontend changes can make formulas selectable without exposing th
 >
 > The Chrome warning describes Tampermonkey's ability to run user-installed scripts; it is not a remote-code permission added by this project. Only install Userscripts you trust and have reviewed.
 >
-> The Userscript does not create a separate browser toolbar icon. It remains an entry inside Tampermonkey. After refreshing `https://chatgpt.com/`, the **公式复制** button in the lower-right corner confirms that it is running.
+> The Userscript does not create a separate browser toolbar icon. It remains an entry inside Tampermonkey. After refreshing `https://chatgpt.com/`, look for the Formula Copy control in the lower-right corner.
 
 1. Install [Tampermonkey](https://www.tampermonkey.net/) or Violentmonkey.
 2. Open the [direct install link](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js).
 3. Confirm installation in your Userscript manager.
 4. Enable user scripts as described above and refresh `https://chatgpt.com/`.
-5. Confirm that the **公式复制** button appears in the lower-right corner.
+5. Confirm that the Formula Copy control appears in the lower-right corner.
 
 ## Use
 
@@ -57,7 +57,7 @@ You can also select a whole passage and press Ctrl+C or use the context-menu Cop
 $a_{i,j}=q_i^\top k_j$
 ```
 
-Use **公式复制** to switch between:
+Use the Formula Copy control to switch between:
 
 - **Copy:** choose a formula format and test the clipboard.
 - **Conversation:** copy a selection, the latest answer, the full conversation, or download `.md`.
@@ -67,7 +67,7 @@ Use **公式复制** to switch between:
 
 | Symptom | What to check |
 | --- | --- |
-| There is no separate Formula Copy toolbar icon | The Userscript does not create one; check Tampermonkey Dashboard and look for the in-page **公式复制** button |
+| There is no separate Formula Copy toolbar icon | The Userscript does not create one; check Tampermonkey Dashboard and look for the in-page Formula Copy control |
 | The script is missing from the Tampermonkey Dashboard | Install through the Raw `.user.js` link above instead of merely downloading a Release asset |
 | The script is enabled but runs nowhere | On Chrome 138+, enable **Allow User Scripts**; on older Chrome, enable Developer mode |
 | It runs elsewhere but not on ChatGPT | Allow Tampermonkey site access on `chatgpt.com`, then refresh |
