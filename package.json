@@ -5,8 +5,9 @@
   "description": "One-click copy of ChatGPT formulas as clean LaTeX.",
   "license": "MIT",
   "scripts": {
-    "check": "node --check chatgpt-latex-copy.user.js && node --check test/smoke.cjs",
-    "test": "npm run check && node test/smoke.cjs"
+    "build:chrome": "python scripts/build_chrome_extension.py",
+    "check": "node --check chatgpt-latex-copy.user.js && node --check extension/popup.js && node --check test/smoke.cjs && node --check test/chrome-extension-smoke.cjs",
+    "test": "npm run check && npm run build:chrome && node --check dist/chatgpt-formula-copy-chrome/content.js && node test/smoke.cjs && node test/chrome-extension-smoke.cjs"
   },
   "devDependencies": {
     "playwright": "^1.62.0"

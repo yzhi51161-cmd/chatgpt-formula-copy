@@ -1,0 +1,12 @@
+{
+  "extensionName": {
+    "message": "ChatGPT 公式复制 - LaTeX"
+  },
+  "extensionDescription": {
+    "message": "单击或框选 ChatGPT 公式，复制为规整的 LaTeX；支持混合文字、行内与独立公式。"
+  },
+  "actionTitle": {
+    "message": "ChatGPT 公式复制"
+  }
+}
+

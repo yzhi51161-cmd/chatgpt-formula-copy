@@ -4,3 +4,6 @@ playwright-report/
 *.log
 .DS_Store
 Thumbs.db
+dist/
+chrome-store/screenshot-*.png
+chrome-store/share-*.png

@@ -6,7 +6,7 @@
 
 [简体中文](./README.md) · [Install](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js) · [Report a bug](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/issues/new?template=bug_report.yml)
 
-A lightweight, network-free Userscript for copying formulas from ChatGPT as clean LaTeX. Click a formula directly, or select mixed text and formulas and use the normal Copy command; formulas in the selection are replaced automatically.
+A lightweight, network-free browser tool available as both a Userscript and a Manifest V3 Chrome extension. Click a formula directly, or select mixed text and formulas and use the normal Copy command; formulas in the selection are replaced automatically.
 
 ## Why
 
@@ -29,6 +29,12 @@ Recent ChatGPT frontend changes can make formulas selectable without exposing th
 3. Confirm installation in your Userscript manager.
 4. Refresh `https://chatgpt.com/`. A green **公式复制** button should appear in the lower-right corner.
 
+### Chrome extension
+
+The Chrome Web Store edition is being prepared for review. Developers can run `npm run build:chrome` to create `dist/chatgpt-formula-copy-chrome-v4.1.0.zip`, with `manifest.json` correctly placed at the archive root.
+
+Enable either the Chrome extension or the Userscript, not both.
+
 ## Use
 
 Click any formula in a ChatGPT answer. A green outline and toast confirm a successful copy.
@@ -46,7 +52,10 @@ Use the **公式复制** control to change output mode, test the clipboard, paus
 ```bash
 npm install
 npm test
+npm run build:chrome
 ```
+
+See [CHROME_WEB_STORE.md](./CHROME_WEB_STORE.md) for listing and review details, and [PRIVACY.md](./PRIVACY.md) for the privacy policy.
 
 ## Contributing
 

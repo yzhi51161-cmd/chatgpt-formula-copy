@@ -6,7 +6,7 @@
 
 [English](./README_EN.md) · [直接安装](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js) · [报告问题](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/issues/new?template=bug_report.yml)
 
-一个轻量、无网络请求的 Userscript：既可单击公式直接复制，也可像普通文字一样框选整段后按 Ctrl+C；选区中的公式会自动替换为规整的 LaTeX，并使用 `$...$` 或 `$$...$$` 包裹。
+一个轻量、无网络请求的浏览器工具，同时提供 Userscript 与 Manifest V3 Chrome 扩展：既可单击公式直接复制，也可像普通文字一样框选整段后按 Ctrl+C；选区中的公式会自动替换为规整的 LaTeX，并使用 `$...$` 或 `$$...$$` 包裹。
 
 > 解决新版 ChatGPT 公式“可以选中，但复制不到原始 LaTeX”的问题。
 
@@ -29,6 +29,12 @@
 2. 点击 [直接安装脚本](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js)。
 3. 在脚本管理器的安装页面确认安装。
 4. 打开或刷新 `https://chatgpt.com/`，页面右下角应出现绿色的 **公式复制** 按钮。
+
+### Chrome 扩展
+
+Chrome Web Store 版本正在准备审核。开发者可运行 `npm run build:chrome`，生成 `dist/chatgpt-formula-copy-chrome-v4.1.0.zip`；ZIP 内的 `manifest.json` 位于压缩包根目录，可直接上传开发者后台。
+
+请只启用 Chrome 扩展或 Userscript 其中一种，避免同一功能重复运行。
 
 ## 使用
 
@@ -59,7 +65,10 @@ $$\int_{-\infty}^{\infty}e^{-x^2}\,dx=\sqrt{\pi}$$
 ```bash
 npm install
 npm test
+npm run build:chrome
 ```
+
+Chrome Web Store 的商店文案、权限说明和审核步骤见 [CHROME_WEB_STORE.md](./CHROME_WEB_STORE.md)，隐私政策见 [PRIVACY.md](./PRIVACY.md)。
 
 ## 参与贡献
 
