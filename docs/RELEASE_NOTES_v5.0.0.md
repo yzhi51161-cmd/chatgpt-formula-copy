@@ -8,7 +8,7 @@ Download `chatgpt-latex-copy.user.js`, then open it with Tampermonkey or Violent
 
 On Chrome 138+ with Tampermonkey 5.3+, right-click Tampermonkey → **Manage extension** → enable **Allow User Scripts**. On older Chrome versions, enable **Developer mode** on the extensions page.
 
-The Userscript does not create a separate browser toolbar icon. Refresh ChatGPT and look for the **公式复制** button in the lower-right corner.
+The Userscript does not create a separate browser toolbar icon. Refresh ChatGPT and look for the Formula Copy control in the lower-right corner.
 
 ## Highlights
 
@@ -16,7 +16,7 @@ The Userscript does not create a separate browser toolbar icon. Refresh ChatGPT 
 - Copy mixed text-and-formula selections with Markdown math delimiters.
 - Choose automatic `$` / `$$`, always-inline, or raw LaTeX output.
 - Copy a selection, the latest answer, or the full conversation as Markdown.
-- Use **提取对话内容为md** to download the current conversation as an `.md` file.
+- Download the current conversation as an `.md` file with the conversation export action.
 - Switch between Chinese and English UI from Settings; the choice is stored locally.
 - Preserve headings, lists, quotes, code blocks, tables, links, images, and formulas in exports.
 - Use the compact permission helper at the bottom of the panel when troubleshooting Tampermonkey setup.
