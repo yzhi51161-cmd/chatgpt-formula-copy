@@ -33,7 +33,7 @@ const chromePath = process.env.CHROME_PATH;
             globalThis.__popupMessages.push(message);
             if (message.type === "GPT_FORMULA_COPY_STATUS") {
               return {
-                version: "5.0.1",
+                version: "5.0.2",
                 formulaCount: 8,
                 messageCount: 6,
                 copyFormat: "smart"
@@ -51,7 +51,7 @@ const chromePath = process.env.CHROME_PATH;
     await page.locator('#connection[data-state="connected"]').waitFor();
     assert.equal(await page.locator("#formula-count").innerText(), "8");
     assert.equal(await page.locator("#message-count").innerText(), "6");
-    assert.match(await page.locator("#connection-detail").innerText(), /v5\.0\.1/);
+    assert.match(await page.locator("#connection-detail").innerText(), /v5\.0\.2/);
     await page.locator("#userscript-help").click();
     assert.equal(await page.evaluate(() => globalThis.__copiedText), "chrome://extensions");
     assert.match(await page.locator("#userscript-help").innerText(), /已复制/);

@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.2 - 2026-08-10
+
+- Reduced the visible update-reminder version check from once per day to at most once every 3 days. No update notice is shown when the installed version is current.
+
 ## 5.0.1 - 2026-08-10
 
 - Bumped the Userscript version so existing v5.0.0 installations can receive the visual refinements through the declared update URL.

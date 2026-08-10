@@ -1,6 +1,6 @@
 {
   "name": "chatgpt-formula-copy",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "private": true,
   "description": "Copy ChatGPT formulas as clean LaTeX and extract math-rich conversations as Markdown.",
   "license": "MIT",
