@@ -1,6 +1,6 @@
 # ChatGPT Formula Copy
 
-[![Version](https://img.shields.io/badge/version-5.0.2-22c55e)](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/releases/latest)
+[![Version](https://img.shields.io/badge/version-5.0.0-22c55e)](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/releases/latest)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Install](https://img.shields.io/badge/install-Userscript-16a34a)](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js)
 

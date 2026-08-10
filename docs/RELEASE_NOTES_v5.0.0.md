@@ -23,6 +23,12 @@ The Userscript does not create a separate browser toolbar icon. Refresh ChatGPT 
 - Use the more visible **Star this project** chip beside the panel title to open the GitHub project page.
 - Process all page content locally without uploads or remote code.
 
+## Update behavior
+
+- Tampermonkey and Violentmonkey use the declared update URL for normal Userscript updates.
+- As a visible fallback, the panel checks its public version metadata at most once every **3 days**. When the installed version is current, no update notice is shown.
+- The request contains no ChatGPT messages, formulas, selections, or clipboard data.
+
 ## Release file
 
 - `chatgpt-latex-copy.user.js` — the only file users need to install.

@@ -1,15 +1,9 @@
 # Changelog
 
-## 5.0.2 - 2026-08-10
-
-- Reduced the visible update-reminder version check from once per day to at most once every 3 days. No update notice is shown when the installed version is current.
-
-## 5.0.1 - 2026-08-10
-
-- Bumped the Userscript version so existing v5.0.0 installations can receive the visual refinements through the declared update URL.
-- Added a once-per-24-hour version check and a persistent in-panel update link. It reads only the public script metadata and never sends ChatGPT content.
-
 ## 5.0.0 - 2026-08-09
+
+- Added a lightweight update reminder: when a newer version is available, the panel shows a persistent install link. The public version metadata is checked at most once every 3 days, and no notice is shown when the installed version is current.
+- Refined the panel logo, project Star chip, and always-visible language switch.
 
 - Redesigned the in-page control as an animated Copy / Export / Settings toolkit.
 - Added Markdown copy for the latest assistant response and the full current conversation.

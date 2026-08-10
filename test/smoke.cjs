@@ -28,7 +28,7 @@ const chromePath = process.env.CHROME_PATH;
         globalThis.__gmValues[key] = value;
       };
       globalThis.GM_xmlhttpRequest = (request) => {
-        setTimeout(() => request.onload({ status: 200, responseText: "// ==UserScript==\n// @version      5.0.3\n// ==/UserScript==" }), 0);
+        setTimeout(() => request.onload({ status: 200, responseText: "// ==UserScript==\n// @version      5.0.1\n// ==/UserScript==" }), 0);
       };
     });
 
@@ -56,7 +56,7 @@ const chromePath = process.env.CHROME_PATH;
     assert.equal(await starProject.getAttribute("href"), "https://github.com/yzhi51161-cmd/chatgpt-formula-copy");
     const updateNotice = page.locator("#gpt-formula-copy-control #update-notice");
     await updateNotice.waitFor({ state: "visible" });
-    assert.match(await updateNotice.innerText(), /5\.0\.3/);
+    assert.match(await updateNotice.innerText(), /5\.0\.1/);
     assert.equal(await updateNotice.getAttribute("href"), "https://github.com/yzhi51161-cmd/chatgpt-formula-copy/releases/latest/download/chatgpt-latex-copy.user.js");
     const panel = page.locator("#gpt-formula-copy-control #panel");
     const panelHead = page.locator("#gpt-formula-copy-control #panel-head");
@@ -96,7 +96,7 @@ const chromePath = process.env.CHROME_PATH;
       "格式选择应持久化"
     );
 
-    assert.equal(await page.evaluate(() => globalThis.__GPT_LATEX_COPY_API__.getStatus().version), "5.0.2");
+    assert.equal(await page.evaluate(() => globalThis.__GPT_LATEX_COPY_API__.getStatus().version), "5.0.0");
 
     const markdownExport = await page.evaluate(() => {
       const api = globalThis.__GPT_LATEX_COPY_API__;

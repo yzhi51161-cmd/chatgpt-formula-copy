@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatGPT 公式复制
 // @namespace    chatgpt-formula-copy.share
-// @version      5.0.2
+// @version      5.0.0
 // @license      MIT
 // @description  单击或框选 ChatGPT 公式，复制为规整 LaTeX；也可提取对话为 Markdown。
 // @homepageURL  https://github.com/yzhi51161-cmd/chatgpt-formula-copy
@@ -23,7 +23,7 @@
 (function () {
   "use strict";
 
-  const SCRIPT_VERSION = "5.0.2";
+  const SCRIPT_VERSION = "5.0.0";
   const UPDATE_SOURCE_URL = "https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js";
   const UPDATE_INSTALL_URL = "https://github.com/yzhi51161-cmd/chatgpt-formula-copy/releases/latest/download/chatgpt-latex-copy.user.js";
   const UPDATE_CHECK_INTERVAL_MS = 3 * 24 * 60 * 60 * 1000;

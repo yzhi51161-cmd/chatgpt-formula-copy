@@ -14,7 +14,7 @@ const chromePath = process.env.CHROME_PATH;
 (async () => {
   const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
   assert.equal(manifest.manifest_version, 3);
-  assert.equal(manifest.version, "5.0.2");
+  assert.equal(manifest.version, "5.0.0");
   assert.deepEqual(manifest.permissions, ["storage"]);
   for (const key of ["host_permissions", "optional_permissions", "optional_host_permissions", "externally_connectable"]) {
     assert.ok(!manifest[key], `${key} should remain absent`);
@@ -136,7 +136,7 @@ const chromePath = process.env.CHROME_PATH;
         resolve
       );
     }));
-    assert.equal(status.version, "5.0.2");
+    assert.equal(status.version, "5.0.0");
     assert.ok(status.formulaCount >= 5);
     assert.equal(status.messageCount, 3);
 
