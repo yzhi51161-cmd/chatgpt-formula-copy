@@ -135,6 +135,7 @@
       language: "界面语言", languageButton: "EN", diagnostics: "复制排查信息", troubleshooting: "遇到问题时",
       diagnosticsLabel: "公式诊断信息", localOnly: "只在本机整理 · 不上传",
       starProject: "为项目点亮一颗星", updateAvailable: "发现新版本 v{version}", updateNow: "去更新",
+      collapseLauncher: "收起图标", expandLauncher: "展开图标",
       permissionHelp: "油猴版没显示？复制权限页地址", launcher: "公式复制", ready: "就绪", openPanel: "打开公式复制"
     },
     en: {
@@ -148,6 +149,7 @@
       language: "UI language", languageButton: "中", diagnostics: "Copy diagnostics", troubleshooting: "For troubleshooting",
       diagnosticsLabel: "Formula diagnostics", localOnly: "Local only · No uploads",
       starProject: "Star this project", updateAvailable: "v{version} is ready", updateNow: "Update",
+      collapseLauncher: "Collapse launcher", expandLauncher: "Expand launcher",
       permissionHelp: "Userscript missing? Copy setup page", launcher: "Formula Copy", ready: "Ready", openPanel: "Open Formula Copy"
     }
   };
@@ -210,6 +212,17 @@
         resolve("");
       }
     });
+  }
+
+  function loadLauncherPosition() {
+    try {
+      const stored = typeof GM_getValue === "function" ? GM_getValue("launcherPosition", null) : null;
+      const left = Number(stored?.left);
+      const top = Number(stored?.top);
+      return Number.isFinite(left) && Number.isFinite(top) ? { left, top } : null;
+    } catch (error) {
+      return null;
+    }
   }
 
   function loadCopyFormat() {
@@ -281,6 +294,8 @@
   let clipboardTextarea = null;
   let pendingPanelTab = null;
   let metricsRefreshTimer = 0;
+  let launcherCollapsed = loadBooleanSetting("launcherCollapsed", false);
+  let launcherPosition = loadLauncherPosition();
   let availableUpdateVersion = (() => {
     try {
       const stored = typeof GM_getValue === "function" ? GM_getValue("availableUpdateVersion", "") : "";
@@ -989,6 +1004,41 @@
     format.value = copyFormat;
   }
 
+  function constrainLauncherPosition(left, top, width, height) {
+    return {
+      left: Math.min(Math.max(8, left), Math.max(8, window.innerWidth - width - 8)),
+      top: Math.min(Math.max(8, top), Math.max(8, window.innerHeight - height - 8))
+    };
+  }
+
+  function applyLauncherPosition() {
+    if (!controlHost || !launcherPosition) return;
+    const rect = controlHost.getBoundingClientRect();
+    const position = constrainLauncherPosition(launcherPosition.left, launcherPosition.top, rect.width || 54, rect.height || 54);
+    controlHost.style.setProperty("left", `${position.left}px`, "important");
+    controlHost.style.setProperty("top", `${position.top}px`, "important");
+    controlHost.style.setProperty("right", "auto", "important");
+    controlHost.style.setProperty("bottom", "auto", "important");
+  }
+
+  function refreshLauncherPresentation() {
+    if (!controlShadow) return;
+    const shell = controlShadow.getElementById("launcher-shell");
+    const collapse = controlShadow.getElementById("launcher-collapse");
+    if (!shell || !collapse) return;
+    shell.dataset.collapsed = String(launcherCollapsed);
+    collapse.textContent = launcherCollapsed ? "+" : "−";
+    const labelKey = launcherCollapsed ? "expandLauncher" : "collapseLauncher";
+    collapse.setAttribute("aria-label", uiCopy(labelKey));
+    collapse.title = uiCopy(labelKey);
+  }
+
+  function setLauncherCollapsed(collapsed) {
+    launcherCollapsed = Boolean(collapsed);
+    saveSetting("launcherCollapsed", launcherCollapsed);
+    refreshLauncherPresentation();
+  }
+
   function refreshUpdateNotice() {
     if (!controlShadow) return;
     const notice = controlShadow.getElementById("update-notice");
@@ -1048,6 +1098,7 @@
     }
     const languageToggle = controlShadow.getElementById("language-toggle");
     if (languageToggle) languageToggle.dataset.language = uiLanguage;
+    refreshLauncherPresentation();
     refreshUpdateNotice();
     refreshControlState();
   }
@@ -1113,14 +1164,17 @@
         * { box-sizing: border-box; }
         button, select, textarea { font: inherit; }
         button { -webkit-tap-highlight-color: transparent; }
+        #launcher-shell { position:relative; display:flex; align-items:center; }
         #launcher {
           display:flex; align-items:center; gap:9px; min-height:54px;
           padding:7px 11px 7px 7px; border:1px solid rgba(92,128,211,.58); border-radius:999px;
           background:linear-gradient(135deg,rgba(255,255,255,.97),rgba(224,236,255,.96) 52%,rgba(239,233,252,.94)); color:#35436c; cursor:pointer;
           box-shadow:0 12px 34px rgba(58,83,157,.22),0 3px 15px rgba(91,142,190,.15),inset 0 1px rgba(255,255,255,.96);
-          font-weight:700;
-          transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+          font-weight:700; touch-action:none; user-select:none;
+          transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,width .18s ease,padding .18s ease;
         }
+        #launcher-shell[data-collapsed="true"] #launcher { width:54px; min-width:54px; padding:5px; gap:0; border-radius:18px; }
+        #launcher-shell[data-collapsed="true"] #launcher-label, #launcher-shell[data-collapsed="true"] #launcher-count { display:none; }
         #launcher:hover { transform:translateY(-3px) rotate(-.35deg); border-color:#527bd6; box-shadow:0 17px 40px rgba(58,83,157,.28),0 4px 18px rgba(107,143,219,.18); }
         #launcher:active { transform:translateY(0) scale(.98); }
         #launcher[data-enabled="false"] { background:#eee9e5; color:#8e8488; border-color:#d6ceca; }
@@ -1130,6 +1184,9 @@
           display:grid; place-items:center; min-width:22px; height:22px; padding:0 6px;
           border-radius:999px; background:linear-gradient(135deg,var(--blue-soft),var(--lavender-soft)); color:#3f5f9e; font-size:11px;
         }
+        #launcher-collapse { position:absolute; top:-6px; right:-6px; display:grid; place-items:center; width:20px; height:20px; padding:0; border:1px solid rgba(90,124,201,.42); border-radius:999px; background:rgba(253,254,255,.96); color:#5471b4; cursor:pointer; font-size:13px; font-weight:700; line-height:1; box-shadow:0 3px 10px rgba(57,77,139,.18); opacity:0; transform:scale(.82); transition:opacity .16s ease,transform .16s ease,background .16s ease; }
+        #launcher-shell:hover #launcher-collapse, #launcher-shell:focus-within #launcher-collapse, #launcher-shell[data-collapsed="true"] #launcher-collapse { opacity:1; transform:scale(1); }
+        #launcher-collapse:hover { background:#edf3ff; color:#3158ae; }
         #panel {
           position:absolute; right:0; bottom:67px; width:min(348px,calc(100vw - 24px));
           padding:14px 15px; border:1px solid rgba(113,139,205,.34); border-radius:22px;
@@ -1258,12 +1315,16 @@
         </section>
         <div id="footer"><span data-i18n="localOnly">只在本机整理 · 不上传</span><button id="permission-help" type="button" data-i18n="permissionHelp">油猴版没显示？复制权限页地址</button></div>
       </div>
-      <button id="launcher" type="button" aria-expanded="false">
-        <img id="launcher-icon" src="${CONTROL_ICON_DATA_URL}" alt=""><span data-i18n="launcher">公式复制</span><span id="launcher-count">0</span>
-      </button>
+      <div id="launcher-shell" data-collapsed="false">
+        <button id="launcher" type="button" aria-expanded="false">
+          <img id="launcher-icon" src="${CONTROL_ICON_DATA_URL}" alt=""><span id="launcher-label" data-i18n="launcher">公式复制</span><span id="launcher-count">0</span>
+        </button>
+        <button id="launcher-collapse" type="button" aria-label="收起图标" title="收起图标">−</button>
+      </div>
     `;
 
     const launcher = controlShadow.getElementById("launcher");
+    const launcherCollapse = controlShadow.getElementById("launcher-collapse");
     const panel = controlShadow.getElementById("panel");
     const panelHead = controlShadow.getElementById("panel-head");
     const close = controlShadow.getElementById("close");
@@ -1281,8 +1342,63 @@
     const copyConversation = controlShadow.getElementById("copy-conversation");
     const downloadConversation = controlShadow.getElementById("download-conversation");
 
-    launcher.addEventListener("click", () => {
+    let launcherDrag = null;
+    let launcherJustDragged = false;
+    launcher.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0) return;
+      const rect = controlHost.getBoundingClientRect();
+      launcherDrag = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        offsetX: event.clientX - rect.left,
+        offsetY: event.clientY - rect.top,
+        width: rect.width,
+        height: rect.height,
+        moved: false
+      };
+      launcher.setPointerCapture(event.pointerId);
+    });
+    launcher.addEventListener("pointermove", (event) => {
+      if (!launcherDrag || event.pointerId !== launcherDrag.pointerId) return;
+      const moved = Math.abs(event.clientX - launcherDrag.startX) + Math.abs(event.clientY - launcherDrag.startY) > 4;
+      if (!moved && !launcherDrag.moved) return;
+      launcherDrag.moved = true;
+      const position = constrainLauncherPosition(
+        event.clientX - launcherDrag.offsetX,
+        event.clientY - launcherDrag.offsetY,
+        launcherDrag.width,
+        launcherDrag.height
+      );
+      controlHost.style.setProperty("left", `${position.left}px`, "important");
+      controlHost.style.setProperty("top", `${position.top}px`, "important");
+      controlHost.style.setProperty("right", "auto", "important");
+      controlHost.style.setProperty("bottom", "auto", "important");
+    });
+    const finishLauncherDrag = (event) => {
+      if (!launcherDrag || event.pointerId !== launcherDrag.pointerId) return;
+      if (launcher.hasPointerCapture(event.pointerId)) launcher.releasePointerCapture(event.pointerId);
+      if (launcherDrag.moved) {
+        launcherJustDragged = true;
+        const rect = controlHost.getBoundingClientRect();
+        launcherPosition = { left: Math.round(rect.left), top: Math.round(rect.top) };
+        saveSetting("launcherPosition", launcherPosition);
+      }
+      launcherDrag = null;
+    };
+    launcher.addEventListener("pointerup", finishLauncherDrag);
+    launcher.addEventListener("pointercancel", finishLauncherDrag);
+    launcher.addEventListener("click", (event) => {
+      if (launcherJustDragged) {
+        launcherJustDragged = false;
+        event.preventDefault();
+        return;
+      }
       setPanelOpen(panel.dataset.open !== "true");
+    });
+    launcherCollapse.addEventListener("click", () => {
+      if (!launcherCollapsed) setPanelOpen(false);
+      setLauncherCollapsed(!launcherCollapsed);
     });
     close.addEventListener("click", () => setPanelOpen(false));
     let panelDrag = null;
@@ -1477,6 +1593,7 @@
     });
 
     document.body.appendChild(host);
+    applyLauncherPosition();
     applyUILanguage();
     const firstRun = !loadBooleanSetting("welcomeShown", false);
     if (firstRun) {

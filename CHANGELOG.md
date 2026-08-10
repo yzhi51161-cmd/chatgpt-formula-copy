@@ -4,6 +4,7 @@
 
 - Added a lightweight update reminder: when a newer version is available, the panel shows a persistent install link. The public version metadata is checked at most once every 3 days, and no notice is shown when the installed version is current.
 - Refined the panel logo, project Star chip, and always-visible language switch.
+- Made both the panel and compact launcher draggable, with a persistent launcher position and a Logo-only collapsed state.
 
 - Redesigned the in-page control as an animated Copy / Export / Settings toolkit.
 - Added Markdown copy for the latest assistant response and the full current conversation.

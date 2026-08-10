@@ -21,6 +21,7 @@ The Userscript does not create a separate browser toolbar icon. Refresh ChatGPT 
 - Preserve headings, lists, quotes, code blocks, tables, links, images, and formulas in exports.
 - Use the compact permission helper at the bottom of the panel when troubleshooting Tampermonkey setup.
 - Use the more visible **Star this project** chip beside the panel title to open the GitHub project page.
+- Drag either the expanded panel or the compact launcher. The launcher can collapse to a Logo-only entry and remembers its position locally.
 - Process all page content locally without uploads or remote code.
 
 ## Update behavior

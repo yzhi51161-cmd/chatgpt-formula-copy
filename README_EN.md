@@ -28,7 +28,7 @@ Recent ChatGPT frontend changes can make formulas selectable without exposing th
 - Copies the latest answer or the full current conversation as Markdown.
 - Downloads `.md` files while preserving headings, emphasis, lists, quotes, code blocks, tables, links, image references, and LaTeX.
 - Uses linear formula deduplication, a reusable clipboard fallback, and event-driven control recovery instead of polling; formula source is read at interaction time so streaming updates never return stale LaTeX.
-- Provides a compact translucent panel with lighter typography, more breathing room, and a high-resolution local icon.
+- Provides a compact translucent panel with lighter typography, more breathing room, and a high-resolution local icon. Both the panel and the always-visible launcher can be dragged; the launcher can also collapse to a Logo-only entry.
 - Switches instantly between Chinese and English UI from the panel header and stores the choice locally.
 - Tampermonkey and Violentmonkey can update the Userscript from its declared update URL. As a visible fallback, the Userscript checks its version source at most once every 3 days and shows an update link when a newer version is available. This request never includes ChatGPT content.
 - Formula/message elements are counted locally; content is converted only when the user runs an action.
