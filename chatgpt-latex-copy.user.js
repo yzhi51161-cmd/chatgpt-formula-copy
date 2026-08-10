@@ -1173,7 +1173,8 @@
           font-weight:700; touch-action:none; user-select:none;
           transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,width .18s ease,padding .18s ease;
         }
-        #launcher-shell[data-collapsed="true"] #launcher { width:54px; min-width:54px; padding:5px; gap:0; border-radius:18px; }
+        #launcher-shell[data-collapsed="true"] #launcher { width:54px; min-width:54px; padding:5px; gap:0; border-radius:18px; cursor:grab; }
+        #launcher-shell[data-collapsed="true"] #launcher:active { cursor:grabbing; }
         #launcher-shell[data-collapsed="true"] #launcher-label, #launcher-shell[data-collapsed="true"] #launcher-count { display:none; }
         #launcher:hover { transform:translateY(-3px) rotate(-.35deg); border-color:#527bd6; box-shadow:0 17px 40px rgba(58,83,157,.28),0 4px 18px rgba(107,143,219,.18); }
         #launcher:active { transform:translateY(0) scale(.98); }
