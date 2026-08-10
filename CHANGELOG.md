@@ -6,7 +6,7 @@
 - Added Markdown copy for the latest assistant response and the full current conversation.
 - Added Markdown copy for the current selection and a focused conversation-extraction pane.
 - Reworked the draggable page panel with lighter typography, more breathing room, softer translucent frames, and a high-DPI icon generated from the original 1254px artwork.
-- Refined the page-panel logo into a focused 256px crop for clearer face and formula details, moved the project Star link into the header, and exposed the `EN` / `中` language switch there as well.
+- Refined the page-panel logo into a focused 256px crop for clearer face and formula details, moved the project Star link into the header, and exposed the `EN` / `Chinese` language switch there as well.
 - Added a persistent Chinese / English UI switch in Settings, including localized status and toast messages.
 - Added local `.md` downloads preserving headings, emphasis, lists, quotes, code blocks, tables, links, image references, and LaTeX.
 - Replaced the 1.2-second UI recovery poll with targeted `MutationObserver` recovery.
