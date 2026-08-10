@@ -1,6 +1,6 @@
 # ChatGPT Formula Copy v5.0.0
 
-v5.0.0 brings formula copying, mixed-selection conversion, and Markdown conversation export into one compact, draggable panel with lighter typography, softer translucent frames, and a crisp high-DPI icon.
+v5.0.0 brings formula copying, mixed-selection conversion, and Markdown conversation export into one compact, draggable panel with lighter typography, softer translucent frames, and a focused high-DPI panel icon.
 
 ## Install
 
@@ -20,6 +20,7 @@ The Userscript does not create a separate browser toolbar icon. Refresh ChatGPT 
 - Switch between Chinese and English UI from Settings; the choice is stored locally.
 - Preserve headings, lists, quotes, code blocks, tables, links, images, and formulas in exports.
 - Use the compact permission helper at the bottom of the panel when troubleshooting Tampermonkey setup.
+- Use the in-panel **Star this project** link to open the GitHub project page.
 - Process all page content locally without uploads or remote code.
 
 ## Release file

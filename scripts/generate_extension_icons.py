@@ -12,8 +12,10 @@ from PIL import Image, ImageEnhance, ImageFilter
 ROOT = Path(__file__).resolve().parents[1]
 ICONS_DIR = ROOT / "extension" / "icons"
 DEFAULT_MASTER = ICONS_DIR / "icon-master.png"
+PANEL_ICON = ICONS_DIR / "icon-panel.png"
 USERSCRIPT_PATH = ROOT / "chatgpt-latex-copy.user.js"
 SIZES = (16, 32, 48, 128)
+PANEL_CROP = (110, 170, 1140, 1200)
 
 
 def remove_connected_dark_background(image: Image.Image) -> Image.Image:
@@ -92,6 +94,22 @@ def update_userscript_icon(icon_path: Path) -> None:
         handle.write(updated)
 
 
+def make_panel_icon(image: Image.Image) -> Image.Image:
+    """Create a focused, high-resolution avatar for the 64px floating panel."""
+    width, height = image.size
+    reference_width = 1254
+    reference_height = 1254
+    crop = (
+        round(PANEL_CROP[0] * width / reference_width),
+        round(PANEL_CROP[1] * height / reference_height),
+        round(PANEL_CROP[2] * width / reference_width),
+        round(PANEL_CROP[3] * height / reference_height),
+    )
+    return image.crop(crop).resize((256, 256), Image.Resampling.LANCZOS).filter(
+        ImageFilter.UnsharpMask(radius=1.1, percent=105, threshold=2)
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate optimized Chrome extension icons.")
     parser.add_argument("--source", type=Path, default=DEFAULT_MASTER)
@@ -107,15 +125,17 @@ def main() -> None:
     master = image.resize((512, 512), Image.Resampling.LANCZOS)
     master_path.parent.mkdir(parents=True, exist_ok=True)
     master.save(master_path, optimize=True)
+    panel_icon = make_panel_icon(image)
+    panel_icon.save(PANEL_ICON, "PNG")
 
     for size in SIZES:
         output = ICONS_DIR / f"icon-{size}.png"
         resize_icon(master, size).save(output, optimize=True)
         print(output)
 
-    # The in-page logo is rendered up to 64 CSS pixels. Embed a 128px source so
-    # it stays crisp on high-DPI displays instead of enlarging the 48px icon.
-    update_userscript_icon(ICONS_DIR / "icon-128.png")
+    # The in-page logo is rendered up to 64 CSS pixels. Use a focused 256px crop
+    # so the face and formula card remain readable on high-DPI displays.
+    update_userscript_icon(PANEL_ICON)
     print(USERSCRIPT_PATH)
 
 
