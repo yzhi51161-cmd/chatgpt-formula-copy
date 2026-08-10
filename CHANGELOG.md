@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.0.1 - 2026-08-10
+
+- Bumped the Userscript version so existing v5.0.0 installations can receive the visual refinements through the declared update URL.
+- Added a once-per-24-hour version check and a persistent in-panel update link. It reads only the public script metadata and never sends ChatGPT content.
+
 ## 5.0.0 - 2026-08-09
 
 - Redesigned the in-page control as an animated Copy / Export / Settings toolkit.

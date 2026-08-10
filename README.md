@@ -1,12 +1,12 @@
 # ChatGPT Formula Copy
 
-[![Version](https://img.shields.io/badge/version-5.0.0-22c55e)](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/releases/latest)
+[![Version](https://img.shields.io/badge/version-5.0.1-22c55e)](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/releases/latest)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Install](https://img.shields.io/badge/install-Userscript-16a34a)](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js)
 
 [Install](https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js) · [Report a bug](https://github.com/yzhi51161-cmd/chatgpt-formula-copy/issues/new?template=bug_report.yml)
 
-A lightweight, network-free ChatGPT math-content toolkit. Formulas, selections, answers, and whole conversations are all available from one compact panel.
+A lightweight, privacy-first ChatGPT math-content toolkit. Formulas, selections, answers, and whole conversations are all available from one compact panel.
 
 <p align="center">
   <img src="./docs/ui-preview.png" width="372" alt="Formula Copy page panel">
@@ -29,8 +29,9 @@ Recent ChatGPT frontend changes can make formulas selectable without exposing th
 - Downloads `.md` files while preserving headings, emphasis, lists, quotes, code blocks, tables, links, image references, and LaTeX.
 - Uses linear formula deduplication, a reusable clipboard fallback, and event-driven control recovery instead of polling; formula source is read at interaction time so streaming updates never return stale LaTeX.
 - Provides a compact translucent panel with lighter typography, more breathing room, and a high-resolution local icon.
-- Switches instantly between Chinese and English UI from Settings and stores the choice locally.
-- Makes no network requests. Formula/message elements are counted locally; content is converted only when the user runs an action.
+- Switches instantly between Chinese and English UI from the panel header and stores the choice locally.
+- Tampermonkey and Violentmonkey can update the Userscript from its declared update URL. As a visible fallback, the Userscript checks its version source at most once every 24 hours and shows an update link when a newer version is available. This request never includes ChatGPT content.
+- Formula/message elements are counted locally; content is converted only when the user runs an action.
 
 ## Install
 
@@ -72,6 +73,7 @@ Use the Formula Copy control to switch between:
 | The script is enabled but runs nowhere | On Chrome 138+, enable **Allow User Scripts**; on older Chrome, enable Developer mode |
 | It runs elsewhere but not on ChatGPT | Allow Tampermonkey site access on `chatgpt.com`, then refresh |
 | Tampermonkey says it is running but the green UI is missing | Open an Issue with browser version, script version, and console errors |
+| An update is available but was not installed | Open Tampermonkey Dashboard, select **Check for userscript updates**, then reload ChatGPT |
 
 References: [Chrome userScripts permission change](https://developer.chrome.com/blog/chrome-userscript) · [Tampermonkey FAQ Q209](https://www.tampermonkey.net/faq.php?q=Q209)
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatGPT 公式复制
 // @namespace    chatgpt-formula-copy.share
-// @version      5.0.0
+// @version      5.0.1
 // @license      MIT
 // @description  单击或框选 ChatGPT 公式，复制为规整 LaTeX；也可提取对话为 Markdown。
 // @homepageURL  https://github.com/yzhi51161-cmd/chatgpt-formula-copy
@@ -14,12 +14,19 @@
 // @grant        GM_setClipboard
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @grant        GM_xmlhttpRequest
+// @connect      raw.githubusercontent.com
 // @run-at       document-start
 // @noframes
 // ==/UserScript==
 
 (function () {
   "use strict";
+
+  const SCRIPT_VERSION = "5.0.1";
+  const UPDATE_SOURCE_URL = "https://raw.githubusercontent.com/yzhi51161-cmd/chatgpt-formula-copy/main/chatgpt-latex-copy.user.js";
+  const UPDATE_INSTALL_URL = "https://github.com/yzhi51161-cmd/chatgpt-formula-copy/releases/latest/download/chatgpt-latex-copy.user.js";
+  const UPDATE_CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
   const INSTALL_KEY = "__chatgptFormulaCopyInstalled";
   if (globalThis[INSTALL_KEY]) return;
@@ -127,7 +134,7 @@
       includeMetadata: "附上来源与时间", clickCopy: "点按公式复制", mixedCopy: "整段复制",
       language: "界面语言", languageButton: "EN", diagnostics: "复制排查信息", troubleshooting: "遇到问题时",
       diagnosticsLabel: "公式诊断信息", localOnly: "只在本机整理 · 不上传",
-      starProject: "为项目点亮一颗星",
+      starProject: "为项目点亮一颗星", updateAvailable: "发现新版本 v{version}", updateNow: "去更新",
       permissionHelp: "油猴版没显示？复制权限页地址", launcher: "公式复制", ready: "就绪", openPanel: "打开公式复制"
     },
     en: {
@@ -140,7 +147,7 @@
       includeMetadata: "Include source & time", clickCopy: "Click formulas to copy", mixedCopy: "Copy mixed selections",
       language: "UI language", languageButton: "中", diagnostics: "Copy diagnostics", troubleshooting: "For troubleshooting",
       diagnosticsLabel: "Formula diagnostics", localOnly: "Local only · No uploads",
-      starProject: "Star this project",
+      starProject: "Star this project", updateAvailable: "v{version} is ready", updateNow: "Update",
       permissionHelp: "Userscript missing? Copy setup page", launcher: "Formula Copy", ready: "Ready", openPanel: "Open Formula Copy"
     }
   };
@@ -160,6 +167,49 @@
 
   function uiMessage(chinese, english) {
     return uiLanguage === "en" ? english : chinese;
+  }
+
+  function compareVersions(left, right) {
+    const toParts = (value) => String(value ?? "").replace(/^v/i, "").split(/[.-]/).map((part) => {
+      const parsed = Number.parseInt(part, 10);
+      return Number.isFinite(parsed) ? parsed : 0;
+    });
+    const leftParts = toParts(left);
+    const rightParts = toParts(right);
+    const length = Math.max(leftParts.length, rightParts.length);
+    for (let index = 0; index < length; index += 1) {
+      const difference = (leftParts[index] || 0) - (rightParts[index] || 0);
+      if (difference) return difference;
+    }
+    return 0;
+  }
+
+  function latestVersionFromSource(source) {
+    const match = String(source ?? "").match(/^\s*\/\/\s*@version\s+([^\s]+)/m);
+    return match ? match[1].trim() : "";
+  }
+
+  function fetchLatestScriptVersion() {
+    const request = typeof GM_xmlhttpRequest === "function"
+      ? GM_xmlhttpRequest
+      : globalThis.GM?.xmlHttpRequest;
+    if (typeof request !== "function") return Promise.resolve("");
+    return new Promise((resolve) => {
+      try {
+        request({
+          method: "GET",
+          url: UPDATE_SOURCE_URL,
+          timeout: 6000,
+          onload: (response) => resolve(response.status >= 200 && response.status < 300
+            ? latestVersionFromSource(response.responseText || response.response)
+            : ""),
+          onerror: () => resolve(""),
+          ontimeout: () => resolve("")
+        });
+      } catch (error) {
+        resolve("");
+      }
+    });
   }
 
   function loadCopyFormat() {
@@ -231,6 +281,14 @@
   let clipboardTextarea = null;
   let pendingPanelTab = null;
   let metricsRefreshTimer = 0;
+  let availableUpdateVersion = (() => {
+    try {
+      const stored = typeof GM_getValue === "function" ? GM_getValue("availableUpdateVersion", "") : "";
+      return compareVersions(stored, SCRIPT_VERSION) > 0 ? String(stored) : "";
+    } catch (error) {
+      return "";
+    }
+  })();
 
   function normalizeLatex(value) {
     let latex = String(value ?? "").trim();
@@ -890,7 +948,7 @@
   function buildFormulaDiagnostic(formula) {
     const descendants = Array.from(formula.querySelectorAll("*")).slice(0, 100);
     const payload = {
-      scriptVersion: "5.0.0",
+      scriptVersion: SCRIPT_VERSION,
       formula: describeElement(formula),
       formulaOuterHTML: shorten(formula.outerHTML, 20000),
       annotationCount: formula.querySelectorAll('annotation[encoding="application/x-tex"]').length,
@@ -931,6 +989,54 @@
     format.value = copyFormat;
   }
 
+  function refreshUpdateNotice() {
+    if (!controlShadow) return;
+    const notice = controlShadow.getElementById("update-notice");
+    const text = controlShadow.getElementById("update-notice-text");
+    if (!notice || !text) return;
+    notice.hidden = !availableUpdateVersion;
+    if (!availableUpdateVersion) return;
+    notice.href = UPDATE_INSTALL_URL;
+    text.textContent = uiCopy("updateAvailable").replace("{version}", availableUpdateVersion);
+  }
+
+  async function checkForUpdate() {
+    const now = Date.now();
+    let lastCheck = 0;
+    try {
+      lastCheck = Number(typeof GM_getValue === "function" ? GM_getValue("lastUpdateCheckAt", 0) : 0) || 0;
+    } catch (error) {
+      lastCheck = 0;
+    }
+    if (now - lastCheck < UPDATE_CHECK_INTERVAL_MS) return;
+    saveSetting("lastUpdateCheckAt", now);
+    const remoteVersion = await fetchLatestScriptVersion();
+    if (!remoteVersion || compareVersions(remoteVersion, SCRIPT_VERSION) <= 0) {
+      if (availableUpdateVersion) {
+        availableUpdateVersion = "";
+        saveSetting("availableUpdateVersion", "");
+        refreshUpdateNotice();
+      }
+      return;
+    }
+    availableUpdateVersion = remoteVersion;
+    saveSetting("availableUpdateVersion", remoteVersion);
+    refreshUpdateNotice();
+    let notifiedVersion = "";
+    try {
+      notifiedVersion = typeof GM_getValue === "function" ? GM_getValue("notifiedUpdateVersion", "") : "";
+    } catch (error) {
+      notifiedVersion = "";
+    }
+    if (notifiedVersion !== remoteVersion) {
+      saveSetting("notifiedUpdateVersion", remoteVersion);
+      showToast(uiMessage(
+        `发现新版本 v${remoteVersion}，打开面板即可更新`,
+        `Update v${remoteVersion} is available — open the panel to install`
+      ));
+    }
+  }
+
   function applyUILanguage() {
     if (!controlShadow) return;
     document.documentElement.dataset.gptFormulaCopyLanguage = uiLanguage;
@@ -942,6 +1048,7 @@
     }
     const languageToggle = controlShadow.getElementById("language-toggle");
     if (languageToggle) languageToggle.dataset.language = uiLanguage;
+    refreshUpdateNotice();
     refreshControlState();
   }
 
@@ -1058,6 +1165,12 @@
           background:transparent; color:#927f86; cursor:pointer; font-size:19px;
         }
         #close:hover { background:var(--blue-soft); color:#4167bd; }
+        #update-notice { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:8px 1px 0; padding:6px 9px; border:1px solid rgba(94,130,213,.38); border-radius:11px; background:linear-gradient(120deg,rgba(220,233,255,.78),rgba(243,232,255,.67)); color:#405fa8; font-size:10px; font-weight:650; text-decoration:none; box-shadow:0 4px 14px rgba(61,85,155,.09),inset 0 1px rgba(255,255,255,.78); transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease; }
+        #update-notice:hover { border-color:rgba(69,108,201,.62); transform:translateY(-1px); box-shadow:0 7px 17px rgba(61,85,155,.14); }
+        #update-notice[hidden] { display:none; }
+        #update-notice-icon { color:#db9b38; font-size:13px; line-height:1; }
+        #update-notice-text { min-width:0; flex:1; }
+        #update-notice-action { padding:2px 6px; border-radius:999px; background:rgba(255,255,255,.54); color:#4162ae; font-size:9px; }
         #status {
           margin:9px 0 0; padding:6px 10px; border:1px solid rgba(105,145,216,.3); border-radius:10px;
           background:linear-gradient(110deg,rgba(217,232,255,.58),rgba(224,242,234,.46),rgba(239,234,251,.44)); color:#354f88; font-size:10px; font-weight:560;
@@ -1118,6 +1231,7 @@
           <div id="brand"><img id="brand-icon" src="${CONTROL_ICON_DATA_URL}" alt=""><div id="brand-copy"><div id="brand-title" data-i18n="brandTitle">公式复制</div><div id="brand-subline"><div id="brand-subtitle" data-i18n="brandSubtitle">对话提取</div><a id="star-project" href="https://github.com/yzhi51161-cmd/chatgpt-formula-copy" target="_blank" rel="noreferrer"><span aria-hidden="true">★</span> <span data-i18n="starProject">为项目点亮一颗星</span></a></div></div></div>
           <div id="head-actions"><button id="language-toggle" type="button" aria-label="切换到英语界面" data-i18n="languageButton">EN</button><button id="close" type="button" aria-label="关闭面板" data-i18n-aria="closePanel">×</button></div>
         </div>
+        <a id="update-notice" href="https://github.com/yzhi51161-cmd/chatgpt-formula-copy/releases/latest/download/chatgpt-latex-copy.user.js" target="_blank" rel="noreferrer" hidden><span id="update-notice-icon" aria-hidden="true">✦</span><span id="update-notice-text"></span><span id="update-notice-action" data-i18n="updateNow">去更新</span></a>
         <p id="status"></p>
         <div id="metrics"><div class="metric"><strong id="formula-metric">0</strong><span data-i18n="formulas">页内公式</span></div><div class="metric"><strong id="message-metric">0</strong><span data-i18n="messages">对话消息</span></div></div>
         <div id="tabs" role="tablist" aria-label="工具分类" data-i18n-aria="tools">
@@ -1478,6 +1592,7 @@
       }, { once: true });
       installControlObservers();
     }
+    void checkForUpdate();
     console.info("[ChatGPT 公式复制] initialized", location.href);
   }
 
@@ -1516,7 +1631,7 @@
     },
     getStatus() {
       return {
-        version: "5.0.0",
+        version: SCRIPT_VERSION,
         formulaCount: formulaCount(),
         messageCount: visibleConversationMessageElements().length,
         copyEnabled,
