@@ -48,6 +48,7 @@ const chromePath = process.env.CHROME_PATH;
     const permissionHelp = page.locator("#gpt-formula-copy-control #permission-help");
     assert.match(await permissionHelp.innerText(), /复制权限页地址/);
     const starProject = page.locator("#gpt-formula-copy-control #star-project");
+    assert.equal(await starProject.isVisible(), true, "the project star link should be visible in the panel header");
     assert.match(await starProject.innerText(), /为项目点亮一颗星/);
     assert.equal(await starProject.getAttribute("href"), "https://github.com/yzhi51161-cmd/chatgpt-formula-copy");
     const panel = page.locator("#gpt-formula-copy-control #panel");
@@ -68,8 +69,9 @@ const chromePath = process.env.CHROME_PATH;
       "控制面板应能主动打开"
     );
 
-    await page.locator('#gpt-formula-copy-control [data-tab="settings"]').click();
     const languageToggle = page.locator("#gpt-formula-copy-control #language-toggle");
+    assert.equal(await languageToggle.isVisible(), true, "language switch should be visible in the panel header");
+    assert.equal(await languageToggle.innerText(), "EN", "language switch should show the target language");
     await languageToggle.click();
     assert.equal(await page.locator("#gpt-formula-copy-control #brand-title").innerText(), "Formula Copy");
     assert.equal(await page.locator('#gpt-formula-copy-control [data-tab="export"]').innerText(), "Export");
@@ -77,8 +79,6 @@ const chromePath = process.env.CHROME_PATH;
     await languageToggle.click();
     assert.equal(await page.locator("#gpt-formula-copy-control #brand-title").innerText(), "公式复制");
     assert.equal(await page.evaluate(() => globalThis.__gmValues.uiLanguage), "zh", "中文 UI 选择应持久化");
-    await page.locator('#gpt-formula-copy-control [data-tab="copy"]').click();
-
     const formatSelect = page.locator("#gpt-formula-copy-control #format");
     await formatSelect.selectOption("inline");
     await formatSelect.selectOption("raw");

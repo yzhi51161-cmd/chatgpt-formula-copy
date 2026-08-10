@@ -125,7 +125,7 @@
       copyExample: "复制一条示例", tryIt: "试试看 →", copySelection: "复制选中内容",
       copyLatest: "复制最近回答", copyConversation: "复制整段对话", downloadConversation: "提取对话内容为md",
       includeMetadata: "附上来源与时间", clickCopy: "点按公式复制", mixedCopy: "整段复制",
-      language: "界面语言", languageButton: "English UI", diagnostics: "复制排查信息", troubleshooting: "遇到问题时",
+      language: "界面语言", languageButton: "EN", diagnostics: "复制排查信息", troubleshooting: "遇到问题时",
       diagnosticsLabel: "公式诊断信息", localOnly: "只在本机整理 · 不上传",
       starProject: "为项目点亮一颗星",
       permissionHelp: "油猴版没显示？复制权限页地址", launcher: "公式复制", ready: "就绪", openPanel: "打开公式复制"
@@ -138,7 +138,7 @@
       copyExample: "Copy an example", tryIt: "Try it →", copySelection: "Copy selection",
       copyLatest: "Copy latest answer", copyConversation: "Copy conversation", downloadConversation: "Export conversation as .md",
       includeMetadata: "Include source & time", clickCopy: "Click formulas to copy", mixedCopy: "Copy mixed selections",
-      language: "UI language", languageButton: "中文界面", diagnostics: "Copy diagnostics", troubleshooting: "For troubleshooting",
+      language: "UI language", languageButton: "中", diagnostics: "Copy diagnostics", troubleshooting: "For troubleshooting",
       diagnosticsLabel: "Formula diagnostics", localOnly: "Local only · No uploads",
       starProject: "Star this project",
       permissionHelp: "Userscript missing? Copy setup page", launcher: "Formula Copy", ready: "Ready", openPanel: "Open Formula Copy"
@@ -1045,9 +1045,14 @@
         #panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; cursor:grab; user-select:none; touch-action:none; }
         #panel-head:active { cursor:grabbing; }
         #brand { display:flex; align-items:center; gap:12px; min-width:0; }
+        #brand-copy { min-width:0; }
+        #brand-subline { display:flex; align-items:center; flex-wrap:wrap; gap:4px 6px; margin-top:3px; }
         #brand-icon { display:block; width:64px; height:64px; flex:none; border:2px solid rgba(255,255,255,.82); border-radius:20px; object-fit:cover; object-position:center; box-shadow:0 9px 24px rgba(58,83,157,.25); }
         #brand-title { color:#303a5a; font-size:16px; font-weight:650; letter-spacing:.035em; }
-        #brand-subtitle { margin-top:3px; color:#74809d; font-size:11px; }
+        #brand-subtitle { color:#74809d; font-size:11px; }
+        #head-actions { display:flex; align-items:center; gap:4px; flex:none; }
+        #language-toggle { min-width:31px; padding:4px 8px; border:1px solid rgba(91,130,209,.36); border-radius:10px; background:rgba(255,255,255,.56); color:#4565ae; cursor:pointer; font-size:10px; font-weight:720; letter-spacing:.04em; box-shadow:inset 0 1px rgba(255,255,255,.78); transition:background .18s ease,border-color .18s ease,transform .18s ease; }
+        #language-toggle:hover { background:rgba(231,239,255,.88); border-color:rgba(65,108,198,.62); transform:translateY(-1px); }
         #close {
           display:grid; place-items:center; width:31px; height:31px; padding:0; border:0; border-radius:10px;
           background:transparent; color:#927f86; cursor:pointer; font-size:19px;
@@ -1088,8 +1093,6 @@
         }
         .switch-row { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 3px; padding:7px 1px; border-bottom:1px solid rgba(126,148,198,.16); }
         .switch-copy strong { display:block; color:#414d70; font-size:11px; font-weight:580; }
-        #language-toggle { padding:4px 9px; border:1px solid rgba(102,137,210,.3); border-radius:999px; background:rgba(255,255,255,.48); color:#4a66a4; cursor:pointer; font-size:10px; font-weight:560; }
-        #language-toggle:hover { background:rgba(255,255,255,.72); border-color:rgba(76,121,215,.46); }
         .switch {
           position:relative; width:39px; height:23px; flex:none; padding:0; border:0; border-radius:999px;
           background:#aeb8cf; cursor:pointer; transition:background .18s ease;
@@ -1104,16 +1107,16 @@
         #diagnostic-text[hidden] { display:none; }
         #footer { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:3px 6px; margin:8px 1px 0; color:#7c86a0; font-size:9px; text-align:center; }
         #permission-help { padding:0; border:0; background:transparent; color:#5272b9; cursor:pointer; font-size:9px; text-decoration:underline; text-underline-offset:2px; }
-        #star-project { color:#5877c8; font-size:9px; font-weight:700; letter-spacing:.01em; text-decoration:none; white-space:nowrap; transition:color .18s ease,transform .18s ease; }
-        #star-project span[aria-hidden="true"] { color:#e0a94d; font-size:11px; vertical-align:-1px; }
-        #star-project:hover { color:#345aa9; transform:translateY(-1px); }
+        #star-project { display:inline-flex; align-items:center; gap:3px; padding:3px 7px; border:1px solid rgba(115,143,215,.32); border-radius:999px; background:linear-gradient(135deg,rgba(231,239,255,.86),rgba(248,238,255,.7)); color:#4867b2; font-size:10px; font-weight:700; letter-spacing:.01em; text-decoration:none; white-space:nowrap; box-shadow:0 3px 10px rgba(69,92,163,.1),inset 0 1px rgba(255,255,255,.86); transition:background .18s ease,border-color .18s ease,transform .18s ease,box-shadow .18s ease; }
+        #star-project span[aria-hidden="true"] { color:#e0a94d; font-size:12px; line-height:1; }
+        #star-project:hover { color:#345aa9; border-color:rgba(75,113,204,.58); background:linear-gradient(135deg,rgba(219,232,255,.94),rgba(245,231,255,.84)); transform:translateY(-1px); box-shadow:0 5px 13px rgba(69,92,163,.16); }
         #permission-help:hover { color:#3459a8; }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration:.01ms!important; animation-duration:.01ms!important; } }
       </style>
       <div id="panel" data-open="false" aria-hidden="true">
         <div id="panel-head">
-          <div id="brand"><img id="brand-icon" src="${CONTROL_ICON_DATA_URL}" alt=""><div><div id="brand-title" data-i18n="brandTitle">公式复制</div><div id="brand-subtitle" data-i18n="brandSubtitle">对话提取</div></div></div>
-          <button id="close" type="button" aria-label="关闭面板" data-i18n-aria="closePanel">×</button>
+          <div id="brand"><img id="brand-icon" src="${CONTROL_ICON_DATA_URL}" alt=""><div id="brand-copy"><div id="brand-title" data-i18n="brandTitle">公式复制</div><div id="brand-subline"><div id="brand-subtitle" data-i18n="brandSubtitle">对话提取</div><a id="star-project" href="https://github.com/yzhi51161-cmd/chatgpt-formula-copy" target="_blank" rel="noreferrer"><span aria-hidden="true">★</span> <span data-i18n="starProject">为项目点亮一颗星</span></a></div></div></div>
+          <div id="head-actions"><button id="language-toggle" type="button" aria-label="切换到英语界面" data-i18n="languageButton">EN</button><button id="close" type="button" aria-label="关闭面板" data-i18n-aria="closePanel">×</button></div>
         </div>
         <p id="status"></p>
         <div id="metrics"><div class="metric"><strong id="formula-metric">0</strong><span data-i18n="formulas">页内公式</span></div><div class="metric"><strong id="message-metric">0</strong><span data-i18n="messages">对话消息</span></div></div>
@@ -1136,11 +1139,10 @@
         <section class="pane" role="tabpanel" data-pane="settings" hidden>
           <div class="switch-row"><div class="switch-copy"><strong data-i18n="clickCopy">点按公式复制</strong></div><button id="toggle" class="switch" type="button" role="switch" aria-label="点按公式复制" data-i18n-aria="clickCopy"></button></div>
           <div class="switch-row"><div class="switch-copy"><strong data-i18n="mixedCopy">整段复制</strong></div><button id="selection-toggle" class="switch" type="button" role="switch" aria-label="整段复制" data-i18n-aria="mixedCopy"></button></div>
-          <div class="switch-row"><div class="switch-copy"><strong data-i18n="language">界面语言</strong></div><button id="language-toggle" type="button" data-i18n="languageButton">English UI</button></div>
           <button id="diagnostic" class="action" type="button"><span data-i18n="diagnostics">复制排查信息</span><span class="action-copy" data-i18n="troubleshooting">遇到问题时</span></button>
           <textarea id="diagnostic-text" readonly hidden aria-label="公式诊断信息" data-i18n-aria="diagnosticsLabel"></textarea>
         </section>
-        <div id="footer"><span data-i18n="localOnly">只在本机整理 · 不上传</span><a id="star-project" href="https://github.com/yzhi51161-cmd/chatgpt-formula-copy" target="_blank" rel="noreferrer"><span aria-hidden="true">★</span> <span data-i18n="starProject">为项目点亮一颗星</span></a><button id="permission-help" type="button" data-i18n="permissionHelp">油猴版没显示？复制权限页地址</button></div>
+        <div id="footer"><span data-i18n="localOnly">只在本机整理 · 不上传</span><button id="permission-help" type="button" data-i18n="permissionHelp">油猴版没显示？复制权限页地址</button></div>
       </div>
       <button id="launcher" type="button" aria-expanded="false">
         <img id="launcher-icon" src="${CONTROL_ICON_DATA_URL}" alt=""><span data-i18n="launcher">公式复制</span><span id="launcher-count">0</span>

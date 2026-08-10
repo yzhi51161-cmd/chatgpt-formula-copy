@@ -17,10 +17,10 @@ The Userscript does not create a separate browser toolbar icon. Refresh ChatGPT 
 - Choose automatic `$` / `$$`, always-inline, or raw LaTeX output.
 - Copy a selection, the latest answer, or the full conversation as Markdown.
 - Download the current conversation as an `.md` file with the conversation export action.
-- Switch between Chinese and English UI from Settings; the choice is stored locally.
+- Switch between Chinese and English UI with the always-visible `EN` / `中` button in the panel header; the choice is stored locally.
 - Preserve headings, lists, quotes, code blocks, tables, links, images, and formulas in exports.
 - Use the compact permission helper at the bottom of the panel when troubleshooting Tampermonkey setup.
-- Use the in-panel **Star this project** link to open the GitHub project page.
+- Use the more visible **Star this project** chip beside the panel title to open the GitHub project page.
 - Process all page content locally without uploads or remote code.
 
 ## Release file
